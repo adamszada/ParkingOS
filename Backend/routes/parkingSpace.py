@@ -7,15 +7,15 @@ def add_parking_space():
     if request.method == "POST":
 
         acceptable_types = ["standard", "narrow", "large"]
-        data = request.json
 
+        data = request.json
         parkingID = data.get("parkingID")
         spaceType = data.get("type")
         floor = data.get("floor")
+
         if spaceType.lower() not in acceptable_types:
             # todo check error number
             return jsonify({"message": f"Invalid parking space type. Acceptable types: {acceptable_types}"}), 500
-
         try:
             jsonFile = {
                 'parkingID': parkingID,
@@ -32,7 +32,7 @@ def add_parking_space():
     return jsonify({"message": "Invalid request method."}), 405
 
 
-@app.route("/get_parking_spaces", methods=["GET"])
+@app.route("/all_parking_spaces", methods=["GET"])
 def get_parking_spaces():
     if request.method == "GET":
         try:
