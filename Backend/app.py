@@ -145,31 +145,9 @@ def update_exit_date(ticket_id):
 
     return jsonify({"message": "Invalid request method."}), 405
 
-@app.route("/add_car", methods=["POST"])
-def add_car():
-    if request.method == "POST":
-        data = request.json  # Get car data from the request
 
-        # Extract car data from JSON
-        brand = data.get('brand')
-        model = data.get('model')
-        license_plate = data.get('license_plate')
 
-        try:
-            # Create a new document in the 'Cars' collection
-            car_ref = db.collection('Cars').document()
-            car_ref.set({
-                'brand': brand,
-                'model': model,
-                'license_plate': license_plate
-            })
-
-            return jsonify({"message": "Car added successfully."}), 200
-
-        except Exception as e:
-            return jsonify({"message": f"Error adding car: {str(e)}"}), 500
-
-    return jsonify({"message": "Invalid request method."}), 405
+from routes import cars, parking, parkingSpace
 
 if __name__ == "__main__":
     app.run(port=8080, host="0.0.0.0")
