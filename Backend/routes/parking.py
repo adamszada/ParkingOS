@@ -64,6 +64,22 @@ def get_parking_lots():
     return jsonify({"message": "Invalid request method."}), 405
 
 
+@app.route("/get_parking/<parking_id>", methods=["GET"])
+def get_parking_lot(parking_id):
+    if request.method == "GET":
+        try:
+            parking_ref = db.collection('ParkingLots').document(parking_id)
+            parking_doc = parking_ref.get()
+
+            if parking_doc.exists:
+                return jsonify({"id": parking_doc.id, **parking_doc.to_dict()}), 200
+            else:
+                return jsonify({"message": f"Parking with ID {parking_id} not found."}), 404
+        except Exception as e:
+            return jsonify({"message": f"Error getting parking lot: {str(e)}"}), 500
+    return jsonify({"message": "Invalid request method."}), 405
+
+
 @app.route("/get_parking_lots_count", methods=["GET"])
 def get_parking_space_count():
     pass
