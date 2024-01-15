@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
+class EmailRecovery extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _EmailRecoveryState createState() => _EmailRecoveryState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _EmailRecoveryState extends State<EmailRecovery> {
   @override
-  Widget build(BuildContext context) {
+ Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                     width: MediaQuery.of(context).size.width * 5 / 17,
                     child: Text(
-                      "Logowanie",
+                      "Zapomniałem hasła",
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height / 20,
                           color: const Color(0xFF0C3C61),
@@ -59,34 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
-                                    child: Text('login:',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            color: const Color(0xFF0C3C61),
-                                            fontFamily: "Jaldi",
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .height /
-                                                45)),
-                                  ),
-                                ),
-                                TextField(
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text('hasło:',
+                                    child: Text('e-mail:',
                                         textAlign: TextAlign.start,
                                         style: TextStyle(
                                             color: const Color(0xFF0C3C61),
@@ -110,39 +83,13 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: TextButton(
-                                      onPressed: () {
-                                        Navigator.pushNamed(context, '/recovery');
-                                      },
-                                      child: Text(
-                                        'zapomniałem/am hasła',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: const Color(0xFF0C3C61),
-                                            fontFamily: "Jaldi",
-                                            fontWeight: FontWeight.w900,
-                                            decoration:
-                                                TextDecoration.underline,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .height /
-                                                45),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
                                 SizedBox(
                                     width: MediaQuery.of(context).size.width,
                                     height:
                                         MediaQuery.of(context).size.height / 20,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        // TODO: Insert login logic
+                                        Navigator.pushNamed(context, '/newpassword');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -153,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                                       ),
                                       child: Text(
-                                        'zaloguj',
+                                        'przypomnij',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontFamily: "Jaldi",

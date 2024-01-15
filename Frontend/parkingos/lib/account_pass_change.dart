@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
+class AccountPasswordChange extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _AccountPasswordChangeState createState() => _AccountPasswordChangeState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _AccountPasswordChangeState extends State<AccountPasswordChange> {
   @override
-  Widget build(BuildContext context) {
+ Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                     width: MediaQuery.of(context).size.width * 5 / 17,
                     child: Text(
-                      "Logowanie",
+                      "Odzyskiwanie konta",
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height / 20,
                           color: const Color(0xFF0C3C61),
@@ -59,34 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
-                                    child: Text('login:',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            color: const Color(0xFF0C3C61),
-                                            fontFamily: "Jaldi",
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .height /
-                                                45)),
-                                  ),
-                                ),
-                                TextField(
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text('hasło:',
+                                    child: Text('nowe hasło:',
                                         textAlign: TextAlign.start,
                                         style: TextStyle(
                                             color: const Color(0xFF0C3C61),
@@ -114,24 +87,26 @@ class _LoginPageState extends State<LoginPage> {
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
-                                    child: TextButton(
-                                      onPressed: () {
-                                        Navigator.pushNamed(context, '/recovery');
-                                      },
-                                      child: Text(
-                                        'zapomniałem/am hasła',
-                                        textAlign: TextAlign.left,
+                                    child: Text('powtórz nowe hasło:',
+                                        textAlign: TextAlign.start,
                                         style: TextStyle(
                                             color: const Color(0xFF0C3C61),
                                             fontFamily: "Jaldi",
                                             fontWeight: FontWeight.w900,
-                                            decoration:
-                                                TextDecoration.underline,
                                             fontSize: MediaQuery.of(context)
                                                     .size
                                                     .height /
-                                                45),
-                                      ),
+                                                45)),
+                                  ),
+                                ),
+                                TextField(
+                                  obscureText: true,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      borderSide: BorderSide.none,
                                     ),
                                   ),
                                 ),
@@ -153,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                                       ),
                                       child: Text(
-                                        'zaloguj',
+                                        'odzyskaj',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontFamily: "Jaldi",
