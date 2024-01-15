@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/email_recovery.dart';
 import 'package:parkingos/login_page.dart';
+import 'package:parkingos/my_account.dart';
 import 'package:parkingos/register_page.dart';
 import 'package:parkingos/account_pass_change.dart';
 import 'package:parkingos/email_recovery.dart';
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
         '/recovery': (context) => EmailRecovery(),
-        '/newpassword': (context) => AccountPasswordChange()
+        '/newpassword': (context) => AccountPasswordChange(),
+        '/myaccount': (context) => MyAccount()
       },
     );
   }

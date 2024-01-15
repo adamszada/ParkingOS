@@ -116,7 +116,8 @@ class _LoginPageState extends State<LoginPage> {
                                     alignment: Alignment.centerLeft,
                                     child: TextButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(context, '/recovery');
+                                        Navigator.pushNamed(
+                                            context, '/recovery');
                                       },
                                       child: Text(
                                         'zapomniałem/am hasła',
@@ -142,7 +143,8 @@ class _LoginPageState extends State<LoginPage> {
                                         MediaQuery.of(context).size.height / 20,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        // TODO: Insert login logic
+                                        Navigator.pushNamed(
+                                            context, '/myaccount');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
