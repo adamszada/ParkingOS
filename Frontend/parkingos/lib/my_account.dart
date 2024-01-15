@@ -94,7 +94,10 @@ class _MyAccountState extends State<MyAccount> {
                                   children: [
                                     Expanded(
                                         child: ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            context, '/changeemail');
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFF0C3C61),
