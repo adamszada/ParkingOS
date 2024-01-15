@@ -42,8 +42,8 @@ class _MyAccountState extends State<MyAccount> {
           ),
           Center(
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 5 / 8,
-              height: MediaQuery.of(context).size.height * 5 / 12,
+              width: MediaQuery.of(context).size.width * 5 / 7,
+              height: MediaQuery.of(context).size.height * 5 / 13,
               child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
@@ -52,8 +52,8 @@ class _MyAccountState extends State<MyAccount> {
                   child: Padding(
                     padding: const EdgeInsets.all(30),
                     child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      // mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Column(
@@ -88,7 +88,8 @@ class _MyAccountState extends State<MyAccount> {
                                     fontFamily: 'Jaldi'),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(right: 30, top: 10),
+                                padding:
+                                    const EdgeInsets.only(right: 30, top: 10),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -118,7 +119,8 @@ class _MyAccountState extends State<MyAccount> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(right: 30, top: 10),
+                                padding:
+                                    const EdgeInsets.only(right: 30, top: 10),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -174,7 +176,7 @@ class _MyAccountState extends State<MyAccount> {
                                     fontFamily: 'Jaldi'),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 10),
+                                padding: const EdgeInsets.only(top: 10),
                                 child: Row(
                                   children: [
                                     Expanded(
