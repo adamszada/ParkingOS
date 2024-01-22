@@ -7,21 +7,24 @@ class AddVehiclePage extends StatefulWidget {
 }
 
 List<Vehicle> vehicles = [
-  Vehicle(registration: 'ABC123', model: 'Model 3', brand: 'Tesla'),
-  Vehicle(registration: 'DEF456', model: 'Mustang', brand: 'Ford'),
-  Vehicle(registration: 'GHI789', model: 'Civic', brand: 'Honda'),
-  Vehicle(registration: 'JKL012', model: 'Corolla', brand: 'Toyota'),
-  Vehicle(registration: 'MNO345', model: 'CX-5', brand: 'Mazda'),
-  Vehicle(registration: 'PQR678', model: '911', brand: 'Porsche'),
-  Vehicle(registration: 'STU901', model: 'X7', brand: 'BMW'),
-  Vehicle(registration: 'VWX234', model: 'A8', brand: 'Audi'),
-  Vehicle(registration: 'YZA567', model: 'Camry', brand: 'Toyota'),
-  Vehicle(registration: 'BCD890', model: 'Cherokee', brand: 'Jeep')
+  Vehicle(registration: 'ABC 123', model: 'Model 3', brand: 'Tesla'),
+  Vehicle(registration: 'DEF 456', model: 'Mustang', brand: 'Ford'),
+  Vehicle(registration: 'GHI 789', model: 'Civic', brand: 'Honda'),
+  Vehicle(registration: 'JKL 012', model: 'Corolla', brand: 'Toyota'),
+  Vehicle(registration: 'MNO 345', model: 'CX-5', brand: 'Mazda'),
+  Vehicle(registration: 'PQR 678', model: '911', brand: 'Porsche'),
+  Vehicle(registration: 'STU 901', model: 'X7', brand: 'BMW'),
+  Vehicle(registration: 'VWX 234', model: 'A8', brand: 'Audi'),
+  Vehicle(registration: 'YZA 567', model: 'Camry', brand: 'Toyota'),
+  Vehicle(registration: 'BCD 890', model: 'Cherokee', brand: 'Jeep')
 ];
 
 class _AddVehiclePageState extends State<AddVehiclePage> {
   @override
   Widget build(BuildContext context) {
+    TextEditingController brandController = TextEditingController();
+    TextEditingController modelController = TextEditingController();
+    TextEditingController registrationController = TextEditingController();
     return Scaffold(
         body: Padding(
             padding: EdgeInsets.symmetric(
@@ -68,6 +71,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                                   ),
                                 ),
                                 TextField(
+                                  controller: registrationController,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
@@ -97,6 +101,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                                   ),
                                 ),
                                 TextField(
+                                  controller: brandController,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
@@ -126,6 +131,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                                   ),
                                 ),
                                 TextField(
+                                  controller: modelController,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
@@ -147,7 +153,22 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                     children: [
                       Expanded(
                           child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                setState(() {
+                                  if (registrationController.text != "" &&
+                                      modelController.text != "" &&
+                                      brandController.text != "") {
+                                    vehicles.add(Vehicle(
+                                        registration:
+                                            registrationController.text,
+                                        model: modelController.text,
+                                        brand: brandController.text));
+                                    registrationController.text = "";
+                                    modelController.text = "";
+                                    brandController.text = "";
+                                  }
+                                });
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF0C3C61),
                                 shape: RoundedRectangleBorder(
@@ -230,6 +251,21 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
+                        vehicles[index * 3 + rowIndex].registration,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.height / 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Jaldi'),
+                      ),
+                      SizedBox(
+                        child: Container(
+                          color: Colors.white,
+                          height: 5,
+                        ),
+                      ),
+                      Text(
                         vehicles[index * 3 + rowIndex].brand,
                         textAlign: TextAlign.left,
                         style: TextStyle(
@@ -240,15 +276,6 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                       ),
                       Text(
                         vehicles[index * 3 + rowIndex].model,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
-                      ),
-                      Text(
-                        vehicles[index * 3 + rowIndex].registration,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 24,
