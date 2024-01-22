@@ -145,14 +145,24 @@ class _LoginPageState extends State<LoginPage> {
                                       onPressed: () {
                                         Navigator.pushNamed(context, '/home');
                                       },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF0C3C61),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
+                                      
+                                      style: ElevatedButton.styleFrom().copyWith(
+                                        backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                                          (states) {
+                                            if (states.contains(MaterialState.hovered)) {
+                                              return const Color(0xFF11558A);
+                                            } else {
+                                              return const Color(0xFF0C3C61);
+                                            }
+                                          },
                                         ),
+                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30.0),
+                                            )
+                                        )
                                       ),
+
                                       child: Text(
                                         'zaloguj',
                                         style: TextStyle(
