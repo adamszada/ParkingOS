@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:parkingos/util/vehicle.dart';
 
 class AddVehiclePage extends StatefulWidget {
   @override
   _AddVehiclePageState createState() => _AddVehiclePageState();
 }
+
+List<Vehicle> vehicles = [
+  Vehicle(registration: 'ABC123', model: 'Model 3', brand: 'Tesla'),
+  Vehicle(registration: 'DEF456', model: 'Mustang', brand: 'Ford'),
+  Vehicle(registration: 'GHI789', model: 'Civic', brand: 'Honda'),
+  Vehicle(registration: 'JKL012', model: 'Corolla', brand: 'Toyota'),
+  Vehicle(registration: 'MNO345', model: 'CX-5', brand: 'Mazda'),
+  Vehicle(registration: 'PQR678', model: '911', brand: 'Porsche'),
+  Vehicle(registration: 'STU901', model: 'X7', brand: 'BMW'),
+  Vehicle(registration: 'VWX234', model: 'A8', brand: 'Audi'),
+  Vehicle(registration: 'YZA567', model: 'Camry', brand: 'Toyota'),
+  Vehicle(registration: 'BCD890', model: 'Cherokee', brand: 'Jeep')
+];
 
 class _AddVehiclePageState extends State<AddVehiclePage> {
   @override
@@ -175,15 +189,17 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
-                        itemCount: 10,
+                        itemCount: vehicles.length % 3 != 0
+                            ? vehicles.length ~/ 3 + 1
+                            : vehicles.length ~/ 3,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.symmetric(vertical: 5),
                             child: Row(
                               children: [
-                                buildCarItem(index),
-                                buildCarItem(index),
-                                buildCarItem(index)
+                                buildCarItem(index, 0),
+                                buildCarItem(index, 1),
+                                buildCarItem(index, 2)
                               ],
                             ),
                           );
@@ -194,20 +210,74 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
             )));
   }
 
-  Widget buildCarItem(int index) {
+  Widget buildCarItem(int index, int rowIndex) {
+    if (index * 3 + rowIndex >= vehicles.length) {
+      return Expanded(child: Container());
+    }
     return Expanded(
         child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Container(
-        decoration: BoxDecoration(
-            color: const Color(0xff156BAD),
-            borderRadius: BorderRadius.circular(25)),
-        child: Text(
-          'Element $index',
-          style: const TextStyle(color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
-      ),
+          decoration: BoxDecoration(
+              color: const Color(0xff156BAD),
+              borderRadius: BorderRadius.circular(25)),
+          child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        vehicles[index * 3 + rowIndex].brand,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.height / 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Jaldi'),
+                      ),
+                      Text(
+                        vehicles[index * 3 + rowIndex].model,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.height / 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Jaldi'),
+                      ),
+                      Text(
+                        vehicles[index * 3 + rowIndex].registration,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.height / 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Jaldi'),
+                      ),
+                    ],
+                  ),
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        child: Text(
+                          "X",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.height / 24,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Jaldi'),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            vehicles.removeAt(index * 3 + rowIndex);
+                          });
+                        },
+                      ))
+                ],
+              ))),
     ));
   }
 }
