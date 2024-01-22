@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/change_email.dart';
 import 'package:parkingos/email_recovery.dart';
+import 'package:parkingos/base_screen.dart';
 import 'package:parkingos/login_page.dart';
 import 'package:parkingos/my_account.dart';
 import 'package:parkingos/register_page.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'ParKing',
       initialRoute: '/',
       routes: {
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/myaccount': (context) => MyAccount(),
         '/topup': (context) => TopUp(),
         '/changeemail': (context) => ChangeEmail(),
+        '/home': (context) => BaseScreen(),
       },
     );
   }
@@ -43,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HomePageAppBar(),
+      appBar: const HomePageAppBar(),
       body: Stack(
         children: [
           CustomPaint(

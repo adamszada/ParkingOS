@@ -11,35 +11,6 @@ class _MyAccountState extends State<MyAccount> {
     return Scaffold(
         backgroundColor: Colors.white,
         body: Stack(children: [
-          Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                    width: MediaQuery.of(context).size.width / 10,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width / 50,
-                          top: MediaQuery.of(context).size.width / 70),
-                      child: Image.asset(
-                        'assets/parking.png',
-                        alignment: Alignment.centerLeft,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    )),
-              ),
-              Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 5,
-                    child: Container(
-                      color: const Color(0xFF1A88DB),
-                    ),
-                  ))
-            ],
-          ),
           Center(
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 5 / 7,

@@ -143,8 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                                         MediaQuery.of(context).size.height / 20,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(
-                                            context, '/myaccount');
+                                        Navigator.pushNamed(context, '/home');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
