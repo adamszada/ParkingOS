@@ -9,7 +9,7 @@ class BaseScreen extends StatefulWidget {
 }
 
 class BaseScreenState extends State<BaseScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   final tabs = [MyAccount(), AddVehiclePage(), FindParkingPage()];
 
   BaseScreenState();
