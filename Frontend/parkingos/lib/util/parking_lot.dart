@@ -1,10 +1,10 @@
-
 class ParkingLot {
   String name;
   String address;
   int capacity;
   int currentOccupancy;
   double totalEarnings;
+  double curEarnings;
   double earningsToday;
   double dayTariff;
   double nightTariff;
@@ -17,6 +17,7 @@ class ParkingLot {
       this.currentOccupancy = 0,
       this.totalEarnings = 0.0,
       this.earningsToday = 0.0,
+      this.curEarnings = 0.0,
       required this.dayTariff,
       required this.nightTariff});
 
