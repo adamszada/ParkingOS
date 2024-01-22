@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:parkingos/add_vehicle_page.dart';
+import 'package:parkingos/find_parking_page.dart';
 import 'package:parkingos/my_account.dart';
 
 class BaseScreen extends StatefulWidget {
@@ -8,12 +10,11 @@ class BaseScreen extends StatefulWidget {
 
 class BaseScreenState extends State<BaseScreen> {
   int _selectedIndex = 0;
-  final tabs = [MyAccount()];
+  final tabs = [MyAccount(), AddVehiclePage(), FindParkingPage()];
 
   BaseScreenState();
   @override
   Widget build(BuildContext context) {
-    int _selectedIndex = 0;
     return Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
