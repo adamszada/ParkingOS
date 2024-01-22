@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:parkingos/util/vehicle.dart';
 
 class AddVehiclePage extends StatefulWidget {
+  const AddVehiclePage({super.key});
+
   @override
   _AddVehiclePageState createState() => _AddVehiclePageState();
 }
@@ -159,10 +161,13 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                                       modelController.text != "" &&
                                       brandController.text != "") {
                                     vehicles.add(Vehicle(
-                                        registration:
-                                            registrationController.text,
-                                        model: modelController.text,
-                                        brand: brandController.text));
+                                        registration: registrationController
+                                            .text
+                                            .toUpperCase(),
+                                        model:
+                                            modelController.text.toUpperCase(),
+                                        brand: brandController.text
+                                            .toUpperCase()));
                                     registrationController.text = "";
                                     modelController.text = "";
                                     brandController.text = "";

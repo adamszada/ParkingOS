@@ -19,6 +19,8 @@ class ParkingLot {
 }
 
 class FindParkingPage extends StatefulWidget {
+  const FindParkingPage({super.key});
+
   @override
   _ParkingLotsPageState createState() => _ParkingLotsPageState();
 }
@@ -130,7 +132,7 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                   child: Row(
                     children: [
                       Expanded(
-                          child: Padding(padding: EdgeInsets.symmetric(horizontal: 30),
+                          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(

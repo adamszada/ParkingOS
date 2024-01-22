@@ -4,18 +4,20 @@ import 'package:parkingos/email_recovery.dart';
 import 'package:parkingos/base_screen.dart';
 import 'package:parkingos/login_page.dart';
 import 'package:parkingos/my_account.dart';
+import 'package:parkingos/owner_screen.dart';
 import 'package:parkingos/register_page.dart';
 import 'package:parkingos/account_pass_change.dart';
-import 'package:parkingos/email_recovery.dart';
 import 'package:parkingos/top_up.dart';
 import 'package:parkingos/util/homepage_appbar.dart';
 import 'util/wave_painter.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,21 +25,24 @@ class MyApp extends StatelessWidget {
       title: 'ParKing',
       initialRoute: '/',
       routes: {
-        '/': (context) => MyHomePage(),
-        '/login': (context) => LoginPage(),
-        '/register': (context) => RegisterPage(),
-        '/recovery': (context) => EmailRecovery(),
-        '/newpassword': (context) => AccountPasswordChange(),
-        '/myaccount': (context) => MyAccount(),
-        '/topup': (context) => TopUp(),
-        '/changeemail': (context) => ChangeEmail(),
-        '/home': (context) => BaseScreen(),
+        '/': (context) => const MyHomePage(),
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/recovery': (context) => const EmailRecovery(),
+        '/newpassword': (context) => const AccountPasswordChange(),
+        '/myaccount': (context) => const MyAccount(),
+        '/topup': (context) => const TopUp(),
+        '/changeemail': (context) => const ChangeEmail(),
+        '/home': (context) => const BaseScreen(),
+        '/owner': (context) => const OwnerScreen(),
       },
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -81,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Image.asset('assets/short_logo.png'),
                       )
                     ],
-                  ))
+                  )),
             ],
           )
         ],

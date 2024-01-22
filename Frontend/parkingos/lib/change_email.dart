@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ChangeEmail extends StatefulWidget {
+  const ChangeEmail({super.key});
+
   @override
   _ChangeEmailState createState() => _ChangeEmailState();
 }

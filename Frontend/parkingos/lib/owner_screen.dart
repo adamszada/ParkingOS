@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:parkingos/add_vehicle_page.dart';
-import 'package:parkingos/find_parking_page.dart';
-import 'package:parkingos/my_account.dart';
+import 'package:parkingos/parkings_screen.dart';
 
-class BaseScreen extends StatefulWidget {
-  const BaseScreen({super.key});
+class OwnerScreen extends StatefulWidget {
+  const OwnerScreen({super.key});
 
   @override
-  BaseScreenState createState() => BaseScreenState();
+  OwnerScreenState createState() => OwnerScreenState();
 }
 
-class BaseScreenState extends State<BaseScreen> {
+class OwnerScreenState extends State<OwnerScreen> {
   int _selectedIndex = 0;
-  final tabs = [const MyAccount(), const AddVehiclePage(), const FindParkingPage()];
+  final tabs = [
+    const ParkingsScreen(),
+  ];
 
-  BaseScreenState();
+  OwnerScreenState();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,9 +64,7 @@ class BaseScreenState extends State<BaseScreen> {
                       width: MediaQuery.of(context).size.width / 3,
                       child: Row(
                         children: [
-                          buildNavigationItem("moje konto", 0),
-                          buildNavigationItem("moje pojazdy", 1),
-                          buildNavigationItem("znajdź parking", 2),
+                          buildNavigationItem("moje parkingi", 0),
                         ],
                       ),
                     )),
@@ -75,7 +73,7 @@ class BaseScreenState extends State<BaseScreen> {
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height / 128,
                       child: Container(
-                        color: const Color(0xff1A88DB),
+                        color: const Color(0xff072338),
                       ),
                     )),
               ],
@@ -95,7 +93,7 @@ class BaseScreenState extends State<BaseScreen> {
               height: MediaQuery.of(context).size.height / 24,
               decoration: BoxDecoration(
                 color: index == _selectedIndex
-                    ? const Color(0xff1A88DB)
+                    ? const Color(0xff072338)
                     : Colors.grey[200],
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(25),

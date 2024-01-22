@@ -5,7 +5,7 @@ class WavesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Color(0xFF1A88DB)
+      ..color = const Color(0xFF1A88DB)
       ..style = PaintingStyle.fill;
 
     final waveHeight = size.height * 7 / 8;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class EmailRecovery extends StatefulWidget {
+  const EmailRecovery({super.key});
+
   @override
   _EmailRecoveryState createState() => _EmailRecoveryState();
 }

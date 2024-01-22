@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MyAccount extends StatefulWidget {
+  const MyAccount({super.key});
+
   @override
   _MyAccountState createState() => _MyAccountState();
 }
@@ -14,7 +16,7 @@ class _MyAccountState extends State<MyAccount> {
           Center(
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 5 / 7,
-              height: MediaQuery.of(context).size.height * 5 / 13,
+              height: MediaQuery.of(context).size.height * 5 / 14,
               child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
@@ -25,11 +27,12 @@ class _MyAccountState extends State<MyAccount> {
                     child: Row(
                       // mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
                                 "[login]",
@@ -132,7 +135,7 @@ class _MyAccountState extends State<MyAccount> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
                                 "Saldo:",
