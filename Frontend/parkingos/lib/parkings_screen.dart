@@ -10,31 +10,38 @@ class ParkingsScreen extends StatefulWidget {
 
 List<ParkingLot> parkingLots = [
   ParkingLot(
-    name: "Parking Centralny",
-    address: "ul. Główna 1, 00-001 Warszawa",
-    capacity: 15,
-    dayTariff: 10.0,
-    nightTariff: 5.0,
-  ),
+      name: "Parking Centralny",
+      address: "ul. Główna 1, 00-001 Warszawa",
+      capacity: 15,
+      dayTariff: 10.0,
+      nightTariff: 5.0,
+      earningsToday: 100.1,
+      curEarnings: 15),
   ParkingLot(
-    name: "Parking Południowy",
-    address: "ul. Słoneczna 5, 00-002 Kraków",
-    capacity: 20,
-    dayTariff: 12.0,
-    nightTariff: 6.0,
-  ),
+      name: "Parking Południowy",
+      address: "ul. Słoneczna 5, 00-002 Kraków",
+      capacity: 20,
+      dayTariff: 12.0,
+      nightTariff: 6.0,
+      earningsToday: 120.3),
   ParkingLot(
-    name: "Parking Zachodni",
-    address: "ul. Kwiatowa 10, 00-003 Gdańsk",
-    capacity: 25,
-    dayTariff: 8.0,
-    nightTariff: 4.0,
-  ),
+      name: "Parking Zachodni",
+      address: "ul. Kwiatowa 10, 00-003 Gdańsk",
+      capacity: 25,
+      dayTariff: 8.0,
+      nightTariff: 4.0,
+      earningsToday: 320.3),
 ];
 
 class _ParkingsScreenState extends State<ParkingsScreen> {
   @override
   Widget build(BuildContext context) {
+    double sumEarningsToday = 0;
+    double sumCurEarnings = 0;
+    for (int i = 0; i < parkingLots.length; i++) {
+      sumEarningsToday += parkingLots[i].earningsToday;
+      sumCurEarnings += parkingLots[i].curEarnings;
+    }
     return Column(
       children: [
         SizedBox(
@@ -73,7 +80,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  "1200zł",
+                                  "${sumEarningsToday} zł",
                                   style: TextStyle(
                                       fontSize:
                                           MediaQuery.of(context).size.height /
@@ -117,7 +124,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  "120zł/h",
+                                  "${sumCurEarnings} zł",
                                   style: TextStyle(
                                       fontSize:
                                           MediaQuery.of(context).size.height /
@@ -206,7 +213,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Container(
           decoration: BoxDecoration(
-              color: const Color(0xff156BAD),
+              color: const Color(0xff0C3C61),
               borderRadius: BorderRadius.circular(25)),
           child: Padding(
               padding: const EdgeInsets.all(10),
@@ -231,23 +238,105 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                           height: 5,
                         ),
                       ),
-                      Text(
-                        parkingLots[index * 2 + rowIndex].capacity.toString(),
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "adres:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                color: Colors.white,
+                                height: 1.2,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            parkingLots[index * 2 + rowIndex].address,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
                       ),
-                      Text(
-                        parkingLots[index * 2 + rowIndex].address,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "zajęte miejsca:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            "${parkingLots[index * 2 + rowIndex].currentOccupancy}/${parkingLots[index * 2 + rowIndex].capacity}",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "zarobki dzisiaj:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            "${parkingLots[index * 2 + rowIndex].earningsToday} zł",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "zarobki chwilowe:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            "${parkingLots[index * 2 + rowIndex].curEarnings} zł",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
