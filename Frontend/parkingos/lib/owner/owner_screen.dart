@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:parkingos/parkings_screen.dart';
+import 'package:parkingos/owner/parkings_screen.dart';
 
 class OwnerScreen extends StatefulWidget {
   const OwnerScreen({super.key});
@@ -9,10 +9,8 @@ class OwnerScreen extends StatefulWidget {
 }
 
 class OwnerScreenState extends State<OwnerScreen> {
-  int _selectedIndex = 0;
-  final tabs = [
-    const ParkingsScreen(),
-  ];
+  int selectedIndex = 0;
+  final tabs = [const ParkingsScreen()];
 
   OwnerScreenState();
   @override
@@ -78,7 +76,7 @@ class OwnerScreenState extends State<OwnerScreen> {
                     )),
               ],
             )),
-        body: SafeArea(child: tabs[_selectedIndex]));
+        body: SafeArea(child: tabs[selectedIndex]));
   }
 
   Widget buildNavigationItem(String name, int index) {
@@ -86,13 +84,13 @@ class OwnerScreenState extends State<OwnerScreen> {
         child: GestureDetector(
             onTap: () {
               setState(() {
-                _selectedIndex = index;
+                selectedIndex = index;
               });
             },
             child: Container(
               height: MediaQuery.of(context).size.height / 24,
               decoration: BoxDecoration(
-                color: index == _selectedIndex
+                color: index == selectedIndex
                     ? const Color(0xff072338)
                     : Colors.grey[200],
                 borderRadius: const BorderRadius.only(
@@ -108,8 +106,7 @@ class OwnerScreenState extends State<OwnerScreen> {
                             MediaQuery.of(context).size.width
                         ? MediaQuery.of(context).size.height / 40
                         : MediaQuery.of(context).size.width / 40,
-                    color:
-                        index == _selectedIndex ? Colors.white : Colors.black,
+                    color: index == selectedIndex ? Colors.white : Colors.black,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'Jaldi'),
               ),

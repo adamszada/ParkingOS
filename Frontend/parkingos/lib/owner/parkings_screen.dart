@@ -164,7 +164,9 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                     fontFamily: 'Jaldi'),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, '/add_parking');
+                },
                 child: Container(
                   decoration: const BoxDecoration(
                     color: Color(0xff156BAD), // Kolor tła przycisku

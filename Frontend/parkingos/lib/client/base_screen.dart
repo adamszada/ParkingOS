@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:parkingos/add_vehicle_page.dart';
-import 'package:parkingos/find_parking_page.dart';
-import 'package:parkingos/my_account.dart';
+import 'package:parkingos/client/add_vehicle_page.dart';
+import 'package:parkingos/client/find_parking_page.dart';
+import 'package:parkingos/client/my_account.dart';
 
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key});
@@ -12,7 +12,11 @@ class BaseScreen extends StatefulWidget {
 
 class BaseScreenState extends State<BaseScreen> {
   int _selectedIndex = 0;
-  final tabs = [const MyAccount(), const AddVehiclePage(), const FindParkingPage()];
+  final tabs = [
+    const MyAccount(),
+    const AddVehiclePage(),
+    const FindParkingPage()
+  ];
 
   BaseScreenState();
   @override

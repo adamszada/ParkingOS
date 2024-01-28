@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/change_email.dart';
 import 'package:parkingos/email_recovery.dart';
-import 'package:parkingos/base_screen.dart';
+import 'package:parkingos/client/base_screen.dart';
 import 'package:parkingos/login_page.dart';
-import 'package:parkingos/my_account.dart';
-import 'package:parkingos/owner_screen.dart';
+import 'package:parkingos/client/my_account.dart';
+import 'package:parkingos/owner/add_parking_screen.dart';
+import 'package:parkingos/owner/owner_screen.dart';
 import 'package:parkingos/register_page.dart';
 import 'package:parkingos/account_pass_change.dart';
 import 'package:parkingos/top_up.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/changeemail': (context) => const ChangeEmail(),
         '/home': (context) => const BaseScreen(),
         '/owner': (context) => const OwnerScreen(),
+        '/add_parking': (context) => const AddParkingScreen(),
       },
     );
   }
