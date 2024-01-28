@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           fontSize: MediaQuery.of(context).size.width / 12,
                           fontWeight: FontWeight.bold,
                           height: MediaQuery.of(context).size.height /
-                              700, // Line height
+                              750, // Line height
                         ),
                       ),
                       SizedBox(
