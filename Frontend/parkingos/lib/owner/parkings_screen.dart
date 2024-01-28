@@ -16,21 +16,24 @@ List<ParkingLot> parkingLots = [
       dayTariff: 10.0,
       nightTariff: 5.0,
       earningsToday: 100.1,
-      curEarnings: 15),
+      curEarnings: 15,
+      operatingHours: "24/7"),
   ParkingLot(
       name: "Parking Południowy",
       address: "ul. Słoneczna 5, 00-002 Kraków",
       capacity: 20,
       dayTariff: 12.0,
       nightTariff: 6.0,
-      earningsToday: 120.3),
+      earningsToday: 120.3,
+      operatingHours: "24/7"),
   ParkingLot(
       name: "Parking Zachodni",
       address: "ul. Kwiatowa 10, 00-003 Gdańsk",
       capacity: 25,
       dayTariff: 8.0,
       nightTariff: 4.0,
-      earningsToday: 320.3),
+      earningsToday: 320.3,
+      operatingHours: "24/7"),
 ];
 
 class _ParkingsScreenState extends State<ParkingsScreen> {

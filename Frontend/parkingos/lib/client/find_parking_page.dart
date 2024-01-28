@@ -1,22 +1,5 @@
 import 'package:flutter/material.dart';
-
-class ParkingLot {
-  final String title;
-  final String tariffOne;
-  final String tariffTwo;
-  final String address;
-  final String operatingHours;
-  final String rules;
-
-  ParkingLot({
-    required this.title,
-    required this.tariffOne,
-    required this.tariffTwo,
-    required this.address,
-    required this.operatingHours,
-    required this.rules,
-  });
-}
+import 'package:parkingos/util/parking_lot.dart';
 
 class FindParkingPage extends StatefulWidget {
   const FindParkingPage({super.key});
@@ -25,32 +8,43 @@ class FindParkingPage extends StatefulWidget {
   _ParkingLotsPageState createState() => _ParkingLotsPageState();
 }
 
-  final List<ParkingLot> parkingLots = [
+  List<ParkingLot> parkingLots = [
     ParkingLot(
-      title: 'Słoneczny parking',
-      tariffOne: '3.5',
-      tariffTwo: '6.9',
-      address: 'Łódź, Żwirki 26/7',
-      operatingHours: '24h/7',
-      rules: 'umyj auto',
+      name: "Słoneczny parking",
+      address: "ul. Słoneczna 123, Wrocław",
+      capacity: 300,
+      currentOccupancy: 100,
+      totalEarnings: 0.0,
+      earningsToday: 0.0,
+      curEarnings: 0.0,
+      dayTariff: 2.5,
+      nightTariff: 6,
+      operatingHours: "24/7"
     ),
         ParkingLot(
-      title: 'Słoneczny parking 2 ',
-      tariffOne: '3.5',
-      tariffTwo: '6.9',
-      address: 'Łódź, Żwirki 26/7',
-      operatingHours: '24h/7',
-      rules: 'umyj auto',
+      name: "Słoneczny parking 2",
+      address: "ul. Słoneczna 123, Wrocław",
+      capacity: 300,
+      currentOccupancy: 100,
+      totalEarnings: 0.0,
+      earningsToday: 0.0,
+      curEarnings: 0.0,
+      dayTariff: 2.5,
+      nightTariff: 6,
+      operatingHours: "24/7"
     ),
         ParkingLot(
-      title: 'Słoneczny parking 3',
-      tariffOne: '3.5',
-      tariffTwo: '6.9',
-      address: 'Łódź, Żwirki 26/7',
-      operatingHours: '24h/7',
-      rules: 'umyj auto',
-    ),
-    // Add more parking lots here...
+      name: "Słoneczny parking 3",
+      address: "ul. Słoneczna 123, Wrocław",
+      capacity: 300,
+      currentOccupancy: 100,
+      totalEarnings: 0.0,
+      earningsToday: 0.0,
+      curEarnings: 0.0,
+      dayTariff: 2.5,
+      nightTariff: 6,
+      operatingHours: "24/7"
+    )
   ];
 
 class _ParkingLotsPageState extends State<FindParkingPage> {
@@ -171,9 +165,9 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             child: Row(
                               children: [
-                                buildCarItem(index, 0),
-                                buildCarItem(index, 1),
-                                buildCarItem(index, 2)
+                                buildParkingLotItem(index, 0),
+                                buildParkingLotItem(index, 1),
+                                buildParkingLotItem(index, 2)
                               ],
                             ),
                           );
@@ -220,7 +214,7 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
   }
 
 
- Widget buildCarItem(int index, int rowIndex) {
+   Widget buildParkingLotItem(int index, int rowIndex) {
     if (index * 3 + rowIndex >= parkingLots.length) {
       return Expanded(child: Container());
     }
@@ -229,7 +223,7 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Container(
           decoration: BoxDecoration(
-              color: const Color(0xff156BAD),
+              color: const Color(0xff0C3C61),
               borderRadius: BorderRadius.circular(25)),
           child: Padding(
               padding: const EdgeInsets.all(10),
@@ -240,7 +234,7 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        parkingLots[index * 3 + rowIndex].title,
+                        parkingLots[index * 3 + rowIndex].name,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 24,
@@ -254,50 +248,130 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                           height: 5,
                         ),
                       ),
-                      Text(
-                        parkingLots[index * 3 + rowIndex].tariffOne,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "adres:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                color: Colors.white,
+                                height: 1.2,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            parkingLots[index * 3 + rowIndex].address,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
                       ),
-                      Text(
-                        parkingLots[index * 3 + rowIndex].tariffTwo,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "zajęte miejsca:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            "${parkingLots[index * 3 + rowIndex].currentOccupancy}/${parkingLots[index * 2 + rowIndex].capacity}",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
                       ),
-                      Text(
-                        parkingLots[index * 3 + rowIndex].address,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "taryfa dzienna:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            "${parkingLots[index * 3 + rowIndex].dayTariff} zł",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
                       ),
-                      Text(
-                        parkingLots[index * 3 + rowIndex].operatingHours,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "taryfa nocna:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            "${parkingLots[index * 3 + rowIndex].nightTariff} zł",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
                       ),
-                      Text(
-                        parkingLots[index * 3 + rowIndex].rules,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "godziny otwarcia:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          Text(
+                            "${parkingLots[index * 3 + rowIndex].operatingHours} h",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 26,
+                                height: 1.2,
+                                color: Colors.white,
+                                fontFamily: 'Jaldi'),
+                          ),
+                        ],
                       ),
                     ],
                   ),

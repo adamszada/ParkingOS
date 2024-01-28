@@ -8,7 +8,7 @@ class ParkingLot {
   double earningsToday;
   double dayTariff;
   double nightTariff;
-  late String operatingHours;
+  String operatingHours;
 
   ParkingLot(
       {required this.name,
@@ -19,7 +19,8 @@ class ParkingLot {
       this.earningsToday = 0.0,
       this.curEarnings = 0.0,
       required this.dayTariff,
-      required this.nightTariff});
+      required this.nightTariff,
+      required this.operatingHours});
 
   void updateOccupancy(int occupiedSpaces) {
     currentOccupancy = occupiedSpaces;
