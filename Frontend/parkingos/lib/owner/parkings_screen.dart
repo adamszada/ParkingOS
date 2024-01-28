@@ -1,4 +1,7 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
+import 'package:parkingos/owner/manage_parking.dart';
 import 'package:parkingos/util/parking_lot.dart';
 
 class ParkingsScreen extends StatefulWidget {
@@ -214,142 +217,30 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
       return Expanded(child: Container());
     }
     return Expanded(
-        child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: Container(
-          decoration: BoxDecoration(
-              color: const Color(0xff0C3C61),
-              borderRadius: BorderRadius.circular(25)),
-          child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        parkingLots[index * 2 + rowIndex].name,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height / 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi'),
-                      ),
-                      SizedBox(
-                        child: Container(
-                          color: Colors.white,
-                          height: 5,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "adres:",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                color: Colors.white,
-                                height: 1.2,
-                                fontFamily: 'Jaldi'),
-                          ),
-                          Text(
-                            parkingLots[index * 2 + rowIndex].address,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                height: 1.2,
-                                color: Colors.white,
-                                fontFamily: 'Jaldi'),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "zajęte miejsca:",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                height: 1.2,
-                                color: Colors.white,
-                                fontFamily: 'Jaldi'),
-                          ),
-                          Text(
-                            "${parkingLots[index * 2 + rowIndex].currentOccupancy}/${parkingLots[index * 2 + rowIndex].capacity}",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                height: 1.2,
-                                color: Colors.white,
-                                fontFamily: 'Jaldi'),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "zarobki dzisiaj:",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                height: 1.2,
-                                color: Colors.white,
-                                fontFamily: 'Jaldi'),
-                          ),
-                          Text(
-                            "${parkingLots[index * 2 + rowIndex].earningsToday} zł",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                height: 1.2,
-                                color: Colors.white,
-                                fontFamily: 'Jaldi'),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "zarobki chwilowe:",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                height: 1.2,
-                                color: Colors.white,
-                                fontFamily: 'Jaldi'),
-                          ),
-                          Text(
-                            "${parkingLots[index * 2 + rowIndex].curEarnings} zł",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 26,
-                                height: 1.2,
-                                color: Colors.white,
-                                fontFamily: 'Jaldi'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        child: Text(
-                          "X",
+        child: GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/manageParking',
+          arguments: parkingLots[index * 2 + rowIndex],
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: Container(
+            decoration: BoxDecoration(
+                color: const Color(0xff0C3C61),
+                borderRadius: BorderRadius.circular(25)),
+            child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          parkingLots[index * 2 + rowIndex].name,
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               fontSize: MediaQuery.of(context).size.height / 24,
@@ -357,14 +248,136 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                               fontWeight: FontWeight.w900,
                               fontFamily: 'Jaldi'),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            parkingLots.removeAt(index * 2 + rowIndex);
-                          });
-                        },
-                      ))
-                ],
-              ))),
+                        SizedBox(
+                          child: Container(
+                            color: Colors.white,
+                            height: 5,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "adres:",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  color: Colors.white,
+                                  height: 1.2,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                            Text(
+                              parkingLots[index * 2 + rowIndex].address,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "zajęte miejsca:",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                            Text(
+                              "${parkingLots[index * 2 + rowIndex].currentOccupancy}/${parkingLots[index * 2 + rowIndex].capacity}",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "zarobki dzisiaj:",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                            Text(
+                              "${parkingLots[index * 2 + rowIndex].earningsToday} zł",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "zarobki chwilowe:",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                            Text(
+                              "${parkingLots[index * 2 + rowIndex].curEarnings} zł",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.height / 26,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontFamily: 'Jaldi'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          child: Text(
+                            "X",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.height / 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontFamily: 'Jaldi'),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              parkingLots.removeAt(index * 2 + rowIndex);
+                            });
+                          },
+                        ))
+                  ],
+                ))),
+      ),
     ));
   }
 }

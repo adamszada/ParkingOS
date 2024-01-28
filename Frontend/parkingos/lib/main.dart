@@ -5,11 +5,13 @@ import 'package:parkingos/client/base_screen.dart';
 import 'package:parkingos/login_page.dart';
 import 'package:parkingos/client/my_account.dart';
 import 'package:parkingos/owner/add_parking_screen.dart';
+import 'package:parkingos/owner/manage_parking.dart';
 import 'package:parkingos/owner/owner_screen.dart';
 import 'package:parkingos/register_page.dart';
 import 'package:parkingos/account_pass_change.dart';
 import 'package:parkingos/top_up.dart';
 import 'package:parkingos/util/homepage_appbar.dart';
+import 'package:parkingos/util/parking_lot.dart';
 import 'util/wave_painter.dart';
 
 void main() {
@@ -37,6 +39,15 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const BaseScreen(),
         '/owner': (context) => const OwnerScreen(),
         '/add_parking': (context) => const AddParkingScreen(),
+        '/manageParking': (context) {
+          final settings = ModalRoute.of(context)!.settings;
+          if (settings.arguments is ParkingLot) {
+            final parking = settings.arguments as ParkingLot;
+            return ManageParkingScreen(parking: parking);
+          } else {
+            return const OwnerScreen();
+          }
+        }
       },
     );
   }
