@@ -1,3 +1,5 @@
+import random
+
 from flask import jsonify, request
 from app import app, db
 from geopy.distance import geodesic
@@ -9,7 +11,7 @@ def add_parking():
         data = request.json
         if not all(key in data for key in ['name', 'address', 'capacity', 'currentOccupancy', 'totalEarnings',
                                            'earningsToday', 'curEarnings','dayTariff', 'nightTariff', 'operatingHours',
-                                           'dayTariffStartHour','nightTariffStartHour', 'lon', 'lat']):
+                                           'dayTariffStartHour','nightTariffStartHour']):
             return jsonify({"message": "Missing required fields."}), 400
 
         name = data.get("name")
@@ -24,8 +26,8 @@ def add_parking():
         operatingHours = data.get("operatingHours")
         dayTariffStartHour = data.get("dayTariffStartHour")
         nightTariffStartHour = data.get("nightTariffStartHour")
-        lon = data.get("lon")
-        lat = data.get("lat")
+        lon = random.uniform(0, 1000)
+        lat = random.uniform(0, 1000)
 
         try:
             # Create a new document in the 'Cars' collection
