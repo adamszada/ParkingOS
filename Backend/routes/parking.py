@@ -52,9 +52,9 @@ def get_parking_lots():
 
             parkingLots = []
             for car_doc in cars_collection:
-                id = car_doc.id
+                car_id = car_doc.id
                 car_data = car_doc.to_dict()
-                car_data["id"] = id
+                car_data["id"] = car_id
                 parkingLots.append(car_data)
 
             return jsonify({"parkingLots": parkingLots}), 200
@@ -78,10 +78,3 @@ def get_parking_lot(parking_id):
         except Exception as e:
             return jsonify({"message": f"Error getting parking lot: {str(e)}"}), 500
     return jsonify({"message": "Invalid request method."}), 405
-
-
-@app.route("/get_parking_lots_count", methods=["GET"])
-def get_parking_space_count():
-    pass
-
-
