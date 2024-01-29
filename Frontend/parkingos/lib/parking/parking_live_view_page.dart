@@ -308,31 +308,31 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
                           fontSize: MediaQuery.of(context).size.height / 48),
                     ),
                   ),
-                  Expanded(
-                      child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "z.dzienny:",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize:
-                                  MediaQuery.of(context).size.height / 48),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "z.chwilowy:",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize:
-                                  MediaQuery.of(context).size.height / 48),
-                        ),
-                      ),
-                    ],
-                  ))
+                  // Expanded(
+                  //     child: Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: Text(
+                  //         "z.dzienny:",
+                  //         style: TextStyle(
+                  //             color: Colors.white,
+                  //             fontWeight: FontWeight.bold,
+                  //             fontSize:
+                  //                 MediaQuery.of(context).size.height / 48),
+                  //       ),
+                  //     ),
+                  //     Expanded(
+                  //       child: Text(
+                  //         "z.chwilowy:",
+                  //         style: TextStyle(
+                  //             color: Colors.white,
+                  //             fontWeight: FontWeight.bold,
+                  //             fontSize:
+                  //                 MediaQuery.of(context).size.height / 48),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ))
                 ],
               ),
             ),
@@ -378,28 +378,28 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
                           fontSize: MediaQuery.of(context).size.height / 40),
                     ),
                   ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "123 zł",
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 40),
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            "10 zł",
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 40),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: Row(
+                  //     children: [
+                  //       Expanded(
+                  //         child: Text(
+                  //           "123 zł",
+                  //           style: TextStyle(
+                  //               fontSize:
+                  //                   MediaQuery.of(context).size.height / 40),
+                  //         ),
+                  //       ),
+                  //       Expanded(
+                  //         child: Text(
+                  //           "10 zł",
+                  //           style: TextStyle(
+                  //               fontSize:
+                  //                   MediaQuery.of(context).size.height / 40),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ]),
               ),
             ),
