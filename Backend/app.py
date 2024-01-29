@@ -2,7 +2,7 @@
 import os
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import firebase_admin
-from firebase_admin import credentials, auth, firestore
+from firebase_admin import credentials, auth, firestore, storage
 from dotenv import load_dotenv
 from flask_cors import CORS
 
@@ -18,7 +18,7 @@ db = firestore.client()
 def register():
     if request.method == "POST":
         email = request.json['email']       
-        password=request.json['password']
+        password = request.json['password']
 
         try:
             user = auth.get_user_by_email(email)
@@ -149,26 +149,41 @@ def update_exit_date(ticket_id):
 @app.route("/add_car", methods=["POST"])
 def add_car():
     if request.method == "POST":
-        data = request.json  
+        data = request.json  # Get car data from the request
 
+        if not all(key in data for key in ['brand', 'model', 'registration', 'owner_id']):
+            return jsonify({"message": "Missing required fields."}), 400
+
+        if not all(isinstance(data[key], str) for key in ['brand', 'model', 'registration', 'owner_id']):
+            return jsonify({"message": "Invalid data types for fields."}), 400
+
+        existing_car = db.collection('Cars').where('registration', '==', data['registration']).get()
+        if existing_car:
+            return jsonify({"message": "Car with this registration already exists."}), 409
+
+        # Extract car data from JSON
         brand = data.get('brand')
         model = data.get('model')
         registration = data.get('registration')
+        owner_id = data.get('owner_id')
 
         try:
+            # Create a new document in the 'Cars' collection
             car_ref = db.collection('Cars').document()
             car_ref.set({
                 'brand': brand,
                 'model': model,
-                'registration': registration
+                'registration': registration,
+                'owner_id': owner_id
             })
-
             return jsonify({"message": "Car added successfully."}), 200
 
         except Exception as e:
             return jsonify({"message": f"Error adding car: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
+from routes import cars, parking, parkingSpace, tickets
 
 @app.route("/get_cars", methods=["GET"])
 def get_cars():
