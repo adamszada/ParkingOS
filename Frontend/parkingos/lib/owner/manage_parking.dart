@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkingos/parking/parking_users_page.dart';
 import 'package:parkingos/parking/this_parking_page.dart';
 import 'package:parkingos/util/parking_lot.dart';
 
@@ -19,7 +20,7 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
   Widget build(BuildContext context) {
     final tabs = [
       ThisParkingPage(parking: parking),
-      Container(color: Colors.blue),
+      ParkingUsersPage(parking: parking),
       Container(color: Colors.green),
       Container(color: Colors.yellow),
       Container(color: Colors.white),
