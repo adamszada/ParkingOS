@@ -1,7 +1,4 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
-import 'package:parkingos/owner/manage_parking.dart';
 import 'package:parkingos/util/parking_lot.dart';
 
 class ParkingsScreen extends StatefulWidget {
