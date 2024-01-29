@@ -9,23 +9,15 @@ def add_parking():
     if request.method == "POST":
 
         data = request.json
-        if not all(key in data for key in ['name', 'address', 'capacity', 'currentOccupancy', 'totalEarnings',
-                                           'earningsToday', 'curEarnings','dayTariff', 'nightTariff', 'operatingHours',
-                                           'dayTariffStartHour','nightTariffStartHour']):
+        if not all(key in data for key in ['name', 'address', 'capacity', 'dayTariff', 'nightTariff', 'operatingHours']):
             return jsonify({"message": "Missing required fields."}), 400
 
         name = data.get("name")
         address = data.get("address")
         capacity = data.get("capacity")
-        currentOccupancy = data.get('currentOccupancy')
-        totalEarnings = data.get('totalEarnings')
-        earningsToday = data.get('earningsToday')
-        curEarnings = data.get('curEarnings')
         dayTariff = data.get("dayTariff")
         nightTariff = data.get("nightTariff")
         operatingHours = data.get("operatingHours")
-        dayTariffStartHour = data.get("dayTariffStartHour")
-        nightTariffStartHour = data.get("nightTariffStartHour")
         lon = random.uniform(0, 1000)
         lat = random.uniform(0, 1000)
 
@@ -35,15 +27,9 @@ def add_parking():
                 "name": name,
                 "address": address,
                 "capacity": capacity,
-                "currentOccupancy": currentOccupancy,
-                "totalEarnings": totalEarnings,
-                "earningsToday": earningsToday,
-                "curEarnings": curEarnings,
                 "dayTariff": dayTariff,
                 "nightTariff": nightTariff,
                 "operatingHours": operatingHours,
-                "dayTariffStartHour": dayTariffStartHour,
-                "nightTariffStartHour": nightTariffStartHour,
                 "lon": lon,
                 "lat": lat
             }
@@ -123,40 +109,20 @@ def getClosestParkingLots():
 
 @app.route("/get_cheapest_parking_lots", methods=["GET"])
 def getCheapestParkingLots():
-
-
     if request.method == "GET":
-        data = request.json
-        if not all(key in data for key in ['lat', 'lon']):
-            return jsonify({"message": "Missing required fields."}), 400
 
-        user_lat = data.get("lat")
-        user_lon = data.get("lon")
         try:
             parking_lots = db.collection("ParkingLots").get()
-
-            user_location = (user_lat, user_lon)
-
-            sorted_parkings = []
-            for parking_lot in parking_lots:
-                parking_data = parking_lot.to_dict()
-                parking_location = (parking_data.get("lat"), parking_data.get("lon"))
-
-
-                distance = geodesic(user_location, parking_location).kilometers
-                parking_data["distance"] = distance
-                sorted_parkings.append(parking_data)
-
             result_parkings =[]
-            for parking_lot in sorted_parkings:
+            for parking_lot in parking_lots:
                 parking_data = parking_lot.to_dict()
                 dayTariff = parking_data.get("dayTariff")
                 nightTariff = parking_data.get("nightTariff")
                 avgTariff = (dayTariff+nightTariff)/2
                 parking_data["avgTariff"] = avgTariff
                 result_parkings.append(parking_data)
-            sorted_parkings = sorted(result_parkings, key=lambda x: x["distance"])
-            return jsonify({"parking lots": sorted_parkings}), 200
+            sorted_parkings = sorted(result_parkings, key=lambda x: x["avgTariff"])
+            return jsonify({"parkingLots": sorted_parkings}), 200
 
         except Exception as e:
             return jsonify({"message": f"Error getting parking lots: {str(e)}"}), 500

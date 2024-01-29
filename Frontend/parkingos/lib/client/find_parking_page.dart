@@ -11,54 +11,36 @@ class FindParkingPage extends StatefulWidget {
   _ParkingLotsPageState createState() => _ParkingLotsPageState();
 }
 
-  // List<ParkingLot> parkingLots = [
-  //   ParkingLot(
-  //     name: "Słoneczny parking",
-  //     address: "ul. Słoneczna 123, Wrocław",
-  //     capacity: 300,
-  //     currentOccupancy: 100,
-  //     totalEarnings: 0.0,
-  //     earningsToday: 0.0,
-  //     curEarnings: 0.0,
-  //     dayTariff: 2.5,
-  //     nightTariff: 6,
-  //     operatingHours: "24/7"
-  //   ),
-  //       ParkingLot(
-  //     name: "Słoneczny parking 2",
-  //     address: "ul. Słoneczna 123, Wrocław",
-  //     capacity: 300,
-  //     currentOccupancy: 100,
-  //     totalEarnings: 0.0,
-  //     earningsToday: 0.0,
-  //     curEarnings: 0.0,
-  //     dayTariff: 2.5,
-  //     nightTariff: 6,
-  //     operatingHours: "24/7"
-  //   ),
-  //       ParkingLot(
-  //     name: "Słoneczny parking 3",
-  //     address: "ul. Słoneczna 123, Wrocław",
-  //     capacity: 300,
-  //     currentOccupancy: 100,
-  //     totalEarnings: 0.0,
-  //     earningsToday: 0.0,
-  //     curEarnings: 0.0,
-  //     dayTariff: 2.5,
-  //     nightTariff: 6,
-  //     operatingHours: "24/7"
-  //   )
-  // ];
+Future<List<ParkingLot>> getCheapestParkings() async {
+  var url = Uri.parse("http://127.0.0.1:5000/get_cheapest_parking_lots");
+  final response =
+      await http.get(url, headers: {"Content-Type": "application/json"});
+  if (response.statusCode == 200) {
+    final Map<String, dynamic>? data = json.decode(response.body);
+    if (data != null && data.containsKey('parkingLots')) {
+      final List<dynamic> parkingList = data['parkingLots'];
+      print(parkingList);
+      return parkingList.map((e) => ParkingLot.fromJson(e)).toList();
+    } else {
+      // Handle missing or invalid JSON data
+      throw Exception('Invalid JSON data');
+    }
+  } else {
+    print(response.toString());
+    // Handle error or return an empty list
+    throw Exception('Failed to load parking lots');
+  }
+}
 
-Future<List<ParkingLot>> getParkings() async {
+Future<List<ParkingLot>> getClosestParkings() async {
   var url = Uri.parse("http://127.0.0.1:5000/get_parking_lots");
   final response =
       await http.get(url, headers: {"Content-Type": "application/json"});
   if (response.statusCode == 200) {
     final Map<String, dynamic>? data = json.decode(response.body);
     if (data != null && data.containsKey('parkingLots')) {
-      final List<dynamic> carsList = data['parkingLots'];
-      return carsList.map((e) => ParkingLot.fromJson(e)).toList();
+      final List<dynamic> parkingList = data['parkingLots'];
+      return parkingList.map((e) => ParkingLot.fromJson(e)).toList();
     } else {
       // Handle missing or invalid JSON data
       throw Exception('Invalid JSON data');
@@ -73,7 +55,9 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
   int _selectedIndex = 0;
 
 
-  Future<List<ParkingLot>> parkinglotsFuture = getParkings();
+  Future<List<ParkingLot>> parkinglotsCheapest = getCheapestParkings();
+  Future<List<ParkingLot>> parkinglotsClosest = getClosestParkings();
+  
 
 
   @override
@@ -183,7 +167,7 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                 ),
                 Expanded(
                   child: FutureBuilder<List<ParkingLot>>(
-                    future: parkinglotsFuture,
+                    future: _selectedIndex == 0 ? parkinglotsClosest : parkinglotsCheapest,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
@@ -408,7 +392,7 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                                 fontFamily: 'Jaldi'),
                           ),
                           Text(
-                            "${parkingLots[index * 3 + rowIndex].operatingHours} h",
+                            parkingLots[index * 3 + rowIndex].operatingHours,
                             textAlign: TextAlign.left,
                             style: TextStyle(
                                 fontSize:
