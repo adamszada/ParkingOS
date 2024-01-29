@@ -3,3 +3,4 @@ flask
 firebase_admin
 python-dotenv
 flask_cors
+geopy

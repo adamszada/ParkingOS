@@ -1,14 +1,14 @@
 class ParkingLot {
-  String name;
-  String address;
-  int capacity;
-  int currentOccupancy;
-  double totalEarnings;
-  double curEarnings;
-  double earningsToday;
-  double dayTariff;
-  double nightTariff;
-  String operatingHours;
+  late String name;
+  late String address;
+  late int capacity;
+  late int currentOccupancy;
+  late double totalEarnings;
+  late double curEarnings;
+  late double earningsToday;
+  late double dayTariff;
+  late double nightTariff;
+  late String operatingHours;
 
   ParkingLot(
       {required this.name,
@@ -33,6 +33,19 @@ class ParkingLot {
 
   void resetDailyEarnings() {
     earningsToday = 0.0;
+  }
+
+  ParkingLot.fromJson(Map<String, dynamic> json) {
+      name = json['name'] ?? '';
+      address = json['address'] ?? '';
+      capacity = json['capacity'] ?? 0;
+      currentOccupancy = json['currentOccupancy'] ?? 0;
+      totalEarnings = json['totalEarnings'] ?? 0.0;
+      earningsToday =  json['earningsToday'] ?? 0.0;
+      curEarnings =  json['curEarnings'] ?? 0.0;
+      dayTariff =  json['dayTariff'] ?? 0.0;
+      nightTariff =  json['nightTariff'] ?? 0.0;
+      operatingHours =  json['operatingHours'] ?? '';
   }
 
   @override
