@@ -100,7 +100,7 @@ class ThisParkingPageState extends State<ThisParkingPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "godziny funkcjonowowania:",
+                      "godziny funkcjonowania:",
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height <
                                   MediaQuery.of(context).size.width
