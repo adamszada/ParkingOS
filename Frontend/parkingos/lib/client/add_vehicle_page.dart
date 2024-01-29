@@ -11,6 +11,24 @@ class AddVehiclePage extends StatefulWidget {
   _AddVehiclePageState createState() => _AddVehiclePageState();
 }
 
+Future<void> deleteCar(String registration) async {
+  var url = Uri.parse('http://127.0.0.1:5000/delete_car/$registration');
+
+  try {
+    final response = await http.delete(url);
+
+    if (response.statusCode == 200) {
+      print('Car deleted successfully');
+    } else if (response.statusCode == 404) {
+      print('Car not found');
+    } else {
+      print('Error: ${response.body}');
+    }
+  } catch (e) {
+    print('Error sending request: $e');
+  }
+}
+
 Future<List<Vehicle>> getVehicles() async {
   var url = Uri.parse("http://127.0.0.1:5000/get_cars");
   final response =
@@ -363,6 +381,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                         onPressed: () {
                           setState(() {
                             vehicles.removeAt(index * 3 + rowIndex);
+                            deleteCar(vehicle.registration);
                           });
                         },
                       ))

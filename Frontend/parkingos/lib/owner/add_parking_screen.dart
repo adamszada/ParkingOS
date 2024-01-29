@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 class AddParkingScreen extends StatefulWidget {
   const AddParkingScreen({super.key});
 
@@ -8,6 +10,31 @@ class AddParkingScreen extends StatefulWidget {
 }
 
 class _AddParkingScreenState extends State<AddParkingScreen> {
+
+  TextEditingController parkingNameController = TextEditingController();
+  TextEditingController parkingAddressController = TextEditingController();
+  TextEditingController parkingHoursController = TextEditingController();
+  TextEditingController parkingDTariffController = TextEditingController();
+  TextEditingController parkingNTariffController = TextEditingController();
+  TextEditingController parkingFloorsController = TextEditingController();
+  TextEditingController parkingSpotsController = TextEditingController();
+
+   final apiUrl = "http://127.0.0.1:5000/add_parking";
+  Future<void> sendPostRequest() async {
+    await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "name": parkingNameController.text,
+        "address": parkingAddressController.text,
+        "capacity": double.parse(parkingFloorsController.text) * double.parse(parkingSpotsController.text),
+        "dayTariff": double.parse(parkingDTariffController.text),
+        "nightTariff": double.parse(parkingNTariffController.text),
+        "operatingHours": parkingHoursController.text,
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +78,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                       ),
                                     ),
                                     TextField(
+                                      controller: parkingNameController,
                                       decoration: InputDecoration(
                                         filled: true,
                                         fillColor: Colors.white,
@@ -87,6 +115,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
+                                                controller: parkingAddressController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -121,6 +150,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
+                                                controller: parkingHoursController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -161,6 +191,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
+                                                controller: parkingDTariffController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -195,6 +226,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
+                                                controller: parkingNTariffController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -295,6 +327,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 5),
                                           child: TextField(
+                                            controller: parkingFloorsController,
                                             decoration: InputDecoration(
                                               filled: true,
                                               fillColor: Colors.white,
@@ -311,6 +344,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 5),
                                           child: TextField(
+                                            controller: parkingSpotsController,
                                             decoration: InputDecoration(
                                               filled: true,
                                               fillColor: Colors.white,
@@ -370,7 +404,9 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                     BorderRadius.circular(30.0),
                                               ),
                                             ),
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              sendPostRequest();
+                                            },
                                             child: Center(
                                               child: Text(
                                                 "zapisz",
