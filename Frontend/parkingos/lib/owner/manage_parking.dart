@@ -24,7 +24,8 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
       ParkingUsersPage(parking: parking),
       Container(color: Colors.green),
       ParkingCostsPage(parking: parking),
-      Container(color: Colors.white),
+      Container(color: Colors.orange),
+      Container(color: Colors.red),
     ];
     return Scaffold(
       extendBody: true,
@@ -140,6 +141,7 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
                         buildNavigationItem("live view", 2),
                         buildNavigationItem("koszty", 3),
                         buildNavigationItem("statystyki", 4),
+                        buildNavigationItem("podsumowanie", 5),
                         Expanded(child: Container())
                       ],
                     ),
