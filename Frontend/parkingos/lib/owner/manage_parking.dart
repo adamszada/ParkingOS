@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkingos/parking/parking_costs_page.dart';
 import 'package:parkingos/parking/parking_users_page.dart';
 import 'package:parkingos/parking/this_parking_page.dart';
 import 'package:parkingos/util/parking_lot.dart';
@@ -22,7 +23,7 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
       ThisParkingPage(parking: parking),
       ParkingUsersPage(parking: parking),
       Container(color: Colors.green),
-      Container(color: Colors.yellow),
+      ParkingCostsPage(parking: parking),
       Container(color: Colors.white),
     ];
     return Scaffold(
