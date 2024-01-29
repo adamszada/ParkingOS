@@ -51,6 +51,22 @@ def add_parking():
 
     return jsonify({"message": "Invalid request method."}), 405
 
+@app.route("/delete_parking/<parking_id>", methods=["DELETE"])
+def delete_parking_lot(parking_id):
+    if request.method == "DELETE":
+        try:
+            parking_ref = db.collection('ParkingLots').document(parking_id)
+            parking_doc = parking_ref.get()
+
+            if parking_doc.exists:
+                parking_ref.delete()
+                return jsonify({"message": f"Parking with ID {parking_id} deleted successfully."}), 200
+            else:
+                return jsonify({"message": f"Parking with ID {parking_id} not found."}), 404
+        except Exception as e:
+            return jsonify({"message": f"Error deleting parking lot: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
 
 @app.route("/get_parking_lots", methods=["GET"])
 def get_parking_lots():
