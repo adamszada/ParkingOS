@@ -7,6 +7,17 @@ def add_car():
     if request.method == "POST":
         data = request.json  # Get car data from the request
 
+        if not all(key in data for key in ['brand', 'model', 'license_plate']):
+            return jsonify({"message": "Missing required fields."}), 400
+
+        if not isinstance(data['brand'], str) or not isinstance(data['model'], str) or not isinstance(
+                data['license_plate'], str):
+            return jsonify({"message": "Invalid data types for fields."}), 400
+
+        existing_car = db.collection('Cars').where('license_plate', '==', data['license_plate']).get()
+        if existing_car:
+            return jsonify({"message": "Car with this license plate already exists."}), 409
+
         # Extract car data from JSON
         brand = data.get('brand')
         model = data.get('model')
@@ -48,3 +59,4 @@ def get_cars():
             return jsonify({"message": f"Error retrieving cars: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
