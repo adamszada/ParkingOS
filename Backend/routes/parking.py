@@ -154,7 +154,7 @@ def getCheapestParkingLots():
                 nightTariff = parking_data.get("nightTariff")
                 avgTariff = (dayTariff+nightTariff)/2
                 parking_data["avgTariff"] = avgTariff
-                sorted_parkings.append(parking_data)
+                result_parkings.append(parking_data)
             sorted_parkings = sorted(result_parkings, key=lambda x: x["distance"])
             return jsonify({"parking lots": sorted_parkings}), 200
 
