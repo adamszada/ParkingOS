@@ -268,14 +268,14 @@ class _MyAccountState extends State<MyAccount> {
                 width: MediaQuery.of(context).size.width, // Adjust width as needed
                 // height is not specified here to allow the ListView to take up as much space as it needs
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                   child: ListView.builder(
                     shrinkWrap: true, // Important for ListView in a Column
                     physics: NeverScrollableScrollPhysics(), // Disables scrolling within ListView
                     itemCount: (tickets.length / 3).ceil(), // Adjust item count
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                         child: Row(
                           children: [
                             buildMyTicketItem(index, 0),
@@ -451,6 +451,45 @@ class _MyAccountState extends State<MyAccount> {
                       ),
                     ],
                   ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        child: Text(
+                          "QR",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.height / 24,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Jaldi'),
+                        ),
+                        onPressed: () {
+showDialog(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                elevation: 16,
+                child: Container(
+                  decoration: BoxDecoration(
+              color: const Color(0xffD9D9D9),
+              borderRadius: BorderRadius.circular(25)),
+                       child: Text(
+                          tickets[index * 3 + rowIndex].qrCode,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.height / 24,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Jaldi'),
+                        ),
+
+                ),
+              );
+            },
+          );
+                        },
+                      ))
                 ],
               ))),
     ));

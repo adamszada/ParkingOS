@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:parkingos/util/vehicle.dart';
+import 'package:http/http.dart' as http;
 
 class AddVehiclePage extends StatefulWidget {
   const AddVehiclePage({super.key});
@@ -8,25 +11,63 @@ class AddVehiclePage extends StatefulWidget {
   _AddVehiclePageState createState() => _AddVehiclePageState();
 }
 
-List<Vehicle> vehicles = [
-  Vehicle(registration: 'ABC 123', model: 'Model 3', brand: 'Tesla'),
-  Vehicle(registration: 'DEF 456', model: 'Mustang', brand: 'Ford'),
-  Vehicle(registration: 'GHI 789', model: 'Civic', brand: 'Honda'),
-  Vehicle(registration: 'JKL 012', model: 'Corolla', brand: 'Toyota'),
-  Vehicle(registration: 'MNO 345', model: 'CX-5', brand: 'Mazda'),
-  Vehicle(registration: 'PQR 678', model: '911', brand: 'Porsche'),
-  Vehicle(registration: 'STU 901', model: 'X7', brand: 'BMW'),
-  Vehicle(registration: 'VWX 234', model: 'A8', brand: 'Audi'),
-  Vehicle(registration: 'YZA 567', model: 'Camry', brand: 'Toyota'),
-  Vehicle(registration: 'BCD 890', model: 'Cherokee', brand: 'Jeep')
-];
+Future<List<Vehicle>> getVehicles() async {
+  var url = Uri.parse("http://127.0.0.1:5000/get_cars");
+  final response =
+      await http.get(url, headers: {"Content-Type": "application/json"});
+  if (response.statusCode == 200) {
+    final Map<String, dynamic>? data = json.decode(response.body);
+    if (data != null && data.containsKey('cars')) {
+      final List<dynamic> carsList = data['cars'];
+      return carsList.map((e) => Vehicle.fromJson(e)).toList();
+    } else {
+      // Handle missing or invalid JSON data
+      throw Exception('Invalid JSON data');
+    }
+  } else {
+    // Handle error or return an empty list
+    throw Exception('Failed to load vehicles');
+  }
+}
+
+// List<Vehicle> vehicles = [
+//   Vehicle(registration: 'ABC 123', model: 'Model 3', brand: 'Tesla'),
+//   Vehicle(registration: 'DEF 456', model: 'Mustang', brand: 'Ford'),
+//   Vehicle(registration: 'GHI 789', model: 'Civic', brand: 'Honda'),
+//   Vehicle(registration: 'JKL 012', model: 'Corolla', brand: 'Toyota'),
+//   Vehicle(registration: 'MNO 345', model: 'CX-5', brand: 'Mazda'),
+//   Vehicle(registration: 'PQR 678', model: '911', brand: 'Porsche'),
+//   Vehicle(registration: 'STU 901', model: 'X7', brand: 'BMW'),
+//   Vehicle(registration: 'VWX 234', model: 'A8', brand: 'Audi'),
+//   Vehicle(registration: 'YZA 567', model: 'Camry', brand: 'Toyota'),
+//   Vehicle(registration: 'BCD 890', model: 'Cherokee', brand: 'Jeep')
+// ];
 
 class _AddVehiclePageState extends State<AddVehiclePage> {
+  TextEditingController brandController = TextEditingController();
+  TextEditingController modelController = TextEditingController();
+  TextEditingController registrationController = TextEditingController();
+
+  final apiUrl = "http://127.0.0.1:5000/add_car";
+  Future<void> sendPostRequest() async {
+    await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "brand": brandController.text.toUpperCase(),
+        "model": modelController.text.toUpperCase(),
+        "registration": registrationController.text.toUpperCase(),
+      }),
+    );
+  }
+
+  Future<List<Vehicle>> vehiclesFuture = getVehicles();
+
+
+
   @override
   Widget build(BuildContext context) {
-    TextEditingController brandController = TextEditingController();
-    TextEditingController modelController = TextEditingController();
-    TextEditingController registrationController = TextEditingController();
+    
     return Scaffold(
         body: Padding(
             padding: EdgeInsets.symmetric(
@@ -160,14 +201,8 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                                   if (registrationController.text != "" &&
                                       modelController.text != "" &&
                                       brandController.text != "") {
-                                    vehicles.add(Vehicle(
-                                        registration: registrationController
-                                            .text
-                                            .toUpperCase(),
-                                        model:
-                                            modelController.text.toUpperCase(),
-                                        brand: brandController.text
-                                            .toUpperCase()));
+                                    sendPostRequest();
+
                                     registrationController.text = "";
                                     modelController.text = "";
                                     brandController.text = "";
@@ -210,36 +245,59 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                   ),
                 ),
                 Expanded(
-                    child: Container(
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        itemCount: vehicles.length % 3 != 0
-                            ? vehicles.length ~/ 3 + 1
-                            : vehicles.length ~/ 3,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: Row(
-                              children: [
-                                buildCarItem(index, 0),
-                                buildCarItem(index, 1),
-                                buildCarItem(index, 2)
-                              ],
-                            ),
-                          );
-                        },
-                      )),
-                ))
+                  child: FutureBuilder<List<Vehicle>>(
+                    future: vehiclesFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error: ${snapshot.error}"));
+                      } else if (snapshot.hasData) {
+                        return buildVehicleList(snapshot.data!);
+                      } else {
+                        return Center(child: Text("No vehicles found"));
+                      }
+                    },
+                  ),
+                ),
               ],
             )));
   }
 
-  Widget buildCarItem(int index, int rowIndex) {
+  Widget buildVehicleList(List<Vehicle> vehicles) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: vehicles.length % 3 != 0
+            ? vehicles.length ~/ 3 + 1
+            : vehicles.length ~/ 3,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              children: [
+                buildCarItem(vehicles, index, 0),
+                buildCarItem(vehicles, index, 1),
+                buildCarItem(vehicles, index, 2)
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buildCarItem(List<Vehicle> vehicles, int index, int rowIndex) {
     if (index * 3 + rowIndex >= vehicles.length) {
       return Expanded(child: Container());
     }
+
+    final Vehicle vehicle = vehicles[index * 3 + rowIndex];
+    final String registration = vehicle.registration ?? ''; // Use empty string if registration is null
+    final String brand = vehicle.brand ?? ''; // Use empty string if brand is null
+    final String model = vehicle.model ?? ''; // Use empty string if model is null
+
     return Expanded(
         child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -256,7 +314,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        vehicles[index * 3 + rowIndex].registration,
+                        registration,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 24,
@@ -271,7 +329,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                         ),
                       ),
                       Text(
-                        vehicles[index * 3 + rowIndex].brand,
+                        brand,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 24,
@@ -280,7 +338,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                             fontFamily: 'Jaldi'),
                       ),
                       Text(
-                        vehicles[index * 3 + rowIndex].model,
+                        model,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 24,

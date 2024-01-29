@@ -4,9 +4,10 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 cred = credentials.Certificate("credentials.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
@@ -152,14 +153,14 @@ def add_car():
 
         brand = data.get('brand')
         model = data.get('model')
-        license_plate = data.get('license_plate')
+        registration = data.get('registration')
 
         try:
             car_ref = db.collection('Cars').document()
             car_ref.set({
                 'brand': brand,
                 'model': model,
-                'license_plate': license_plate
+                'registration': registration
             })
 
             return jsonify({"message": "Car added successfully."}), 200
@@ -188,4 +189,4 @@ def get_cars():
     return jsonify({"message": "Invalid request method."}), 405
 
 if __name__ == "__main__":
-    app.run(port=8080, host="0.0.0.0")
+    app.run(port=8080, host="0.0.0.0", debug=True)
