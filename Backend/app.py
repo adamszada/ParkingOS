@@ -2,7 +2,7 @@
 import os
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import firebase_admin
-from firebase_admin import credentials, auth, firestore
+from firebase_admin import credentials, auth, firestore, storage
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ db = firestore.client()
 def register():
     if request.method == "POST":
         email = request.json['email']       
-        password=request.json['password']
+        password = request.json['password']
 
         try:
             user = auth.get_user_by_email(email)
@@ -147,7 +147,7 @@ def update_exit_date(ticket_id):
 
 
 
-from routes import cars, parking, parkingSpace
+from routes import cars, parking, parkingSpace, tickets
 
 if __name__ == "__main__":
     app.run(port=8080, host="0.0.0.0")
