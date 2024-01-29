@@ -7,20 +7,20 @@ def add_car():
     if request.method == "POST":
         data = request.json  # Get car data from the request
 
-        if not all(key in data for key in ['brand', 'model', 'license_plate', 'owner_id']):
+        if not all(key in data for key in ['brand', 'model', 'registration', 'owner_id']):
             return jsonify({"message": "Missing required fields."}), 400
 
-        if not all(isinstance(data[key], str) for key in ['brand', 'model', 'license_plate', 'owner_id']):
+        if not all(isinstance(data[key], str) for key in ['brand', 'model', 'registration', 'owner_id']):
             return jsonify({"message": "Invalid data types for fields."}), 400
 
-        existing_car = db.collection('Cars').where('license_plate', '==', data['license_plate']).get()
+        existing_car = db.collection('Cars').where('registration', '==', data['registration']).get()
         if existing_car:
-            return jsonify({"message": "Car with this license plate already exists."}), 409
+            return jsonify({"message": "Car with this registration already exists."}), 409
 
         # Extract car data from JSON
         brand = data.get('brand')
         model = data.get('model')
-        license_plate = data.get('license_plate')
+        registration = data.get('registration')
         owner_id = data.get('owner_id')
 
         try:
@@ -29,7 +29,7 @@ def add_car():
             car_ref.set({
                 'brand': brand,
                 'model': model,
-                'license_plate': license_plate,
+                'registration': registration,
                 'owner_id': owner_id
             })
             return jsonify({"message": "Car added successfully."}), 200
@@ -60,6 +60,7 @@ def get_cars():
 
     return jsonify({"message": "Invalid request method."}), 405
 
+
 @app.route("/get_cars_by_owner/<owner_id>", methods=["GET"])
 def get_cars_by_owner(owner_id):
     if request.method == "GET":
@@ -73,7 +74,7 @@ def get_cars_by_owner(owner_id):
                 cars_list.append({
                     'brand': car_data.get('brand'),
                     'model': car_data.get('model'),
-                    'license_plate': car_data.get('license_plate'),
+                    'registration': car_data.get('registration'),
                     'owner_id': car_data.get('owner_id')
                 })
 
@@ -84,12 +85,13 @@ def get_cars_by_owner(owner_id):
 
     return jsonify({"message": "Invalid request method."}), 405
 
-@app.route("/get_car_by_license_plate/<license_plate>", methods=["GET"])
-def get_car_by_license_plate(license_plate):
+
+@app.route("/get_car_by_registration/<registration>", methods=["GET"])
+def get_car_by_registration(registration):
     if request.method == "GET":
         try:
             # Pobierz informacje o samochodzie na podstawie numeru rejestracyjnego
-            car_query = db.collection('Cars').where('license_plate', '==', license_plate).get()
+            car_query = db.collection('Cars').where('registration', '==', registration).get()
 
             car_data = None
             for car in car_query:
@@ -99,7 +101,7 @@ def get_car_by_license_plate(license_plate):
                 return jsonify({"car": {
                     'brand': car_data.get('brand'),
                     'model': car_data.get('model'),
-                    'license_plate': car_data.get('license_plate'),
+                    'registration': car_data.get('registration'),
                     'owner_id': car_data.get('owner_id')
                 }}), 200
             else:
