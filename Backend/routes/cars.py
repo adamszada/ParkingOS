@@ -40,6 +40,27 @@ def add_car():
     return jsonify({"message": "Invalid request method."}), 405
 
 
+@app.route("/delete_car/<registration>", methods=["DELETE"])
+def delete_car(registration):
+    if request.method == "DELETE":
+        try:
+            car_query = db.collection('Cars').where('registration', '==', registration).stream()
+
+            car_doc = next(car_query)
+
+            car_ref = db.collection('Cars').document(car_doc.id)
+            car_ref.delete()
+
+            return jsonify({"message": "Car deleted successfully."}), 200
+
+        except StopIteration:
+            return jsonify({"message": "Car not found."}), 404
+        except Exception as e:
+            return jsonify({"message": f"Error deleting car: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+
 @app.route("/get_cars", methods=["GET"])
 def get_cars():
     if request.method == "GET":
