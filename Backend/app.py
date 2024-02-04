@@ -5,6 +5,8 @@ import firebase_admin
 from firebase_admin import credentials, auth, firestore, storage
 from dotenv import load_dotenv
 from flask_cors import CORS
+import re
+
 
 app = Flask(__name__)
 CORS(app)
@@ -14,11 +16,23 @@ db = firestore.client()
 
 # --- main ---
 
+def is_valid_email(email):
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return re.match(pattern, email)
+
+
 @app.route("/register", methods=["POST", "GET"])
 def register():
     if request.method == "POST":
         email = request.json['email']       
         password = request.json['password']
+        confirm_password = request.json['confirmPassword']
+
+        if password != confirm_password:
+            return jsonify({"message": "Passwords do not match."}), 400
+
+        if not is_valid_email(email):
+            return jsonify({"message": "Invalid email format."}), 400
 
         try:
             user = auth.get_user_by_email(email)
@@ -30,7 +44,7 @@ def register():
             except auth.AuthError as e:
                 return jsonify({"message": f"Error registering user: {str(e)}"}), 500
 
-    return render_template("signup.html")  
+    return jsonify({"message": "Invalid request method."}), 405
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -38,13 +52,37 @@ def login():
         email = request.json['email']       
         password=request.json['password']
 
+        if not is_valid_email(email):
+            return jsonify({"message": "Invalid email format."}), 400
+
         try:
             user = auth.get_user_by_email(email)
             return jsonify({"message": "User successfully logged in."}), 200
         except auth.UserNotFoundError:
             return jsonify({"message": "User with provided email does not exist."}), 400
 
-    return render_template("login.html")  
+    return jsonify({"message": "Invalid request method."}), 405
+
+
+@app.route("/check_user", methods=["POST"])
+def check_user():
+    if request.method == "POST":
+        email = request.json.get('email')
+
+        if not is_valid_email(email):
+            return jsonify({"message": "Invalid email format."}), 400
+
+        try:
+            # Attempt to get the user by email
+            user = auth.get_user_by_email(email)
+            return jsonify({"exists": True}), 200
+        except auth.UserNotFoundError:
+            return jsonify({"exists": False}), 200
+        except Exception as e:
+            return jsonify({"message": f"Error checking user: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
 
 @app.route("/reset_password", methods=["POST"])
 def reset_password():
