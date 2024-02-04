@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/util/my_ticket.dart';
+import '../globals.dart' as globals;
 
 class MyAccount extends StatefulWidget {
   const MyAccount({super.key});
@@ -39,7 +40,7 @@ List<MyTicket> tickets = [
     moneyDue: 3.75,
     qrCode: 'QR789DEF',
   ),
-    MyTicket(
+  MyTicket(
     registration: 'ABC123',
     carName: 'Toyota Corolla',
     parkTime: DateTime.now().subtract(Duration(hours: 2)),
@@ -72,13 +73,21 @@ List<MyTicket> tickets = [
 ];
 
 class _MyAccountState extends State<MyAccount> {
+  String extractUsernameFromEmail(String email) {
+    if (email.contains('@')) {
+      List<String> parts = email.split('@');
+      return parts.first;
+    } else {
+      return email;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
-        child: Column(
-          children: [
+            child: Column(children: [
           SizedBox(height: 200),
           Center(
             child: SizedBox(
@@ -102,7 +111,7 @@ class _MyAccountState extends State<MyAccount> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                "[login]",
+                                extractUsernameFromEmail(globals.currentUser),
                                 style: TextStyle(
                                     fontSize:
                                         MediaQuery.of(context).size.height / 20,
@@ -120,7 +129,7 @@ class _MyAccountState extends State<MyAccount> {
                                     fontFamily: 'Jaldi'),
                               ),
                               Text(
-                                "bennymaly@gmail.com",
+                                globals.currentUser,
                                 style: TextStyle(
                                     fontSize:
                                         MediaQuery.of(context).size.height / 30,
@@ -265,23 +274,26 @@ class _MyAccountState extends State<MyAccount> {
           SizedBox(height: 100),
           Center(
               child: SizedBox(
-                width: MediaQuery.of(context).size.width, // Adjust width as needed
-                // height is not specified here to allow the ListView to take up as much space as it needs
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                  child: ListView.builder(
-                    shrinkWrap: true, // Important for ListView in a Column
-                    physics: NeverScrollableScrollPhysics(), // Disables scrolling within ListView
-                    itemCount: (tickets.length / 3).ceil(), // Adjust item count
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                        child: Row(
-                          children: [
-                            buildMyTicketItem(index, 0),
-                            buildMyTicketItem(index, 1),
-                            buildMyTicketItem(index, 2),
-                          ],
+            width: MediaQuery.of(context).size.width, // Adjust width as needed
+            // height is not specified here to allow the ListView to take up as much space as it needs
+            child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                child: ListView.builder(
+                  shrinkWrap: true, // Important for ListView in a Column
+                  physics:
+                      NeverScrollableScrollPhysics(), // Disables scrolling within ListView
+                  itemCount: (tickets.length / 3).ceil(), // Adjust item count
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 5),
+                      child: Row(
+                        children: [
+                          buildMyTicketItem(index, 0),
+                          buildMyTicketItem(index, 1),
+                          buildMyTicketItem(index, 2),
+                        ],
                       ),
                     );
                   },
@@ -451,7 +463,7 @@ class _MyAccountState extends State<MyAccount> {
                       ),
                     ],
                   ),
-                    Align(
+                  Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         child: Text(
@@ -464,30 +476,32 @@ class _MyAccountState extends State<MyAccount> {
                               fontFamily: 'Jaldi'),
                         ),
                         onPressed: () {
-showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                elevation: 16,
-                child: Container(
-                  decoration: BoxDecoration(
-              color: const Color(0xffD9D9D9),
-              borderRadius: BorderRadius.circular(25)),
-                       child: Text(
-                          tickets[index * 3 + rowIndex].qrCode,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.height / 24,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontFamily: 'Jaldi'),
-                        ),
-
-                ),
-              );
-            },
-          );
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return Dialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(40)),
+                                elevation: 16,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xffD9D9D9),
+                                      borderRadius: BorderRadius.circular(25)),
+                                  child: Text(
+                                    tickets[index * 3 + rowIndex].qrCode,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize:
+                                            MediaQuery.of(context).size.height /
+                                                24,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w900,
+                                        fontFamily: 'Jaldi'),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         },
                       ))
                 ],

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'globals.dart' as globals;
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -8,6 +12,60 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  String errorMessage = '';
+
+  bool isValidEmail(String email) {
+    final RegExp emailRegex = RegExp(
+      r'^[\w-]+(\.[\w-]+)*@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  Future<void> loginUser() async {
+    final String url = 'http://127.0.0.1:5000/login';
+
+    if (!isValidEmail(emailController.text)) {
+      setState(() {
+        errorMessage = 'Wprowadzono nieprawidłowy adres e-mail.';
+      });
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'email': emailController.text,
+          'password': passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        globals.currentUser = emailController.text;
+        print("User successfully logged in.");
+        Navigator.pushNamed(context, '/home');
+      } else if (response.statusCode == 400) {
+        setState(() {
+          errorMessage = 'Nieprawidłowe dane logowania.';
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Błąd podczas logowania.';
+        });
+      }
+    } catch (e) {
+      print("Error: $e");
+      setState(() {
+        errorMessage = 'Błąd podczas wysyłania żądania.';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 TextField(
+                                  controller: emailController,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
@@ -101,6 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 TextField(
+                                  controller: passwordController,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                     filled: true,
@@ -138,6 +198,24 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                 ),
+                                if (errorMessage.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        errorMessage,
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontFamily: "Jaldi",
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              45,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 const SizedBox(height: 24),
                                 SizedBox(
                                     width: MediaQuery.of(context).size.width,
@@ -145,26 +223,30 @@ class _LoginPageState extends State<LoginPage> {
                                         MediaQuery.of(context).size.height / 20,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(context, '/home');
+                                        loginUser();
                                       },
-                                      
-                                      style: ElevatedButton.styleFrom().copyWith(
-                                        backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                                          (states) {
-                                            if (states.contains(MaterialState.hovered)) {
-                                              return const Color(0xFF11558A);
-                                            } else {
-                                              return const Color(0xFF0C3C61);
-                                            }
-                                          },
-                                        ),
-                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(30.0),
-                                            )
-                                        )
-                                      ),
-
+                                      style: ElevatedButton.styleFrom()
+                                          .copyWith(
+                                              backgroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith<Color?>(
+                                                (states) {
+                                                  if (states.contains(
+                                                      MaterialState.hovered)) {
+                                                    return const Color(
+                                                        0xFF11558A);
+                                                  } else {
+                                                    return const Color(
+                                                        0xFF0C3C61);
+                                                  }
+                                                },
+                                              ),
+                                              shape: MaterialStateProperty.all<
+                                                      RoundedRectangleBorder>(
+                                                  RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30.0),
+                                              ))),
                                       child: Text(
                                         'zaloguj',
                                         style: TextStyle(
