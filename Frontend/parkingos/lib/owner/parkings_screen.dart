@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:parkingos/util/parking_lot.dart';
+import 'package:http/http.dart' as http;
 
 class ParkingsScreen extends StatefulWidget {
   const ParkingsScreen({super.key});
@@ -8,43 +11,53 @@ class ParkingsScreen extends StatefulWidget {
   _ParkingsScreenState createState() => _ParkingsScreenState();
 }
 
-List<ParkingLot> parkingLots = [
-  ParkingLot(
-      name: "Parking Centralny",
-      address: "ul. Główna 1, 00-001 Warszawa",
-      capacity: 15,
-      dayTariff: 10.0,
-      nightTariff: 5.0,
-      earningsToday: 100.1,
-      curEarnings: 15,
-      operatingHours: "24/7"),
-  ParkingLot(
-      name: "Parking Południowy",
-      address: "ul. Słoneczna 5, 00-002 Kraków",
-      capacity: 20,
-      dayTariff: 12.0,
-      nightTariff: 6.0,
-      earningsToday: 120.3,
-      operatingHours: "24/7"),
-  ParkingLot(
-      name: "Parking Zachodni",
-      address: "ul. Kwiatowa 10, 00-003 Gdańsk",
-      capacity: 25,
-      dayTariff: 8.0,
-      nightTariff: 4.0,
-      earningsToday: 320.3,
-      operatingHours: "24/7"),
-];
+Future<void> deleteparking(String id) async {
+  var url = Uri.parse('http://127.0.0.1:5000/delete_parking/$id');
+  print(id);
+  try {
+    final response = await http.delete(url);
 
+    if (response.statusCode == 200) {
+      print('Car deleted successfully');
+    } else if (response.statusCode == 404) {
+      print('Car not found');
+    } else {
+      print('Error: ${response.body}');
+    }
+  } catch (e) {
+    print('Error sending request: $e');
+  }
+}
+
+Future<List<ParkingLot>> getAllParkings() async {
+  var url = Uri.parse("http://127.0.0.1:5000/get_parking_lots");
+  final response =
+      await http.get(url, headers: {"Content-Type": "application/json"});
+  if (response.statusCode == 200) {
+    final Map<String, dynamic>? data = json.decode(response.body);
+    if (data != null && data.containsKey('parkingLots')) {
+      final List<dynamic> parkingList = data['parkingLots'];
+      return parkingList.map((e) => ParkingLot.fromJson(e)).toList();
+    } else {
+      // Handle missing or invalid JSON data
+      throw Exception('Invalid JSON data');
+    }
+  } else {
+    // Handle error or return an empty list
+    throw Exception('Failed to load vehicles');
+  }
+}
+
+  double sumEarningsToday = 0;
+  double sumCurEarnings = 0;
 class _ParkingsScreenState extends State<ParkingsScreen> {
+
+  Future<List<ParkingLot>> parkinglots = getAllParkings();
+
   @override
   Widget build(BuildContext context) {
-    double sumEarningsToday = 0;
-    double sumCurEarnings = 0;
-    for (int i = 0; i < parkingLots.length; i++) {
-      sumEarningsToday += parkingLots[i].earningsToday;
-      sumCurEarnings += parkingLots[i].curEarnings;
-    }
+
+
     return Column(
       children: [
         SizedBox(
@@ -185,34 +198,58 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
             ],
           ),
         ),
-        Expanded(
-            child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: parkingLots.length % 2 != 0
-                      ? parkingLots.length ~/ 2 + 1
-                      : parkingLots.length ~/ 2,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Row(
-                        children: [
-                          buildParkingLotItem(index, 0),
-                          buildParkingLotItem(index, 1),
-                        ],
-                      ),
-                    );
-                  },
-                )))
+                Expanded(
+                  child: FutureBuilder<List<ParkingLot>>(
+                    future: parkinglots,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error: ${snapshot.error}"));
+                      } else if (snapshot.hasData) {
+                        return buildParkingLotList(snapshot.data!);
+                      } else {
+                        return Center(child: Text("No parkings found"));
+                      }
+                    },
+                  ),
+                ),
       ],
     );
   }
 
-  Widget buildParkingLotItem(int index, int rowIndex) {
+  Widget buildParkingLotList(List<ParkingLot> parkingLots){
+    return Expanded( 
+                      child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: 10,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Row(
+                              children: [
+                                buildParkingLotItem(parkingLots, index, 0),
+                                buildParkingLotItem(parkingLots, index, 1),
+                              ],
+                            ),
+                          );
+                        },
+                      )),
+    );
+  }
+
+  Widget buildParkingLotItem(List<ParkingLot> parkingLots, int index, int rowIndex) {
     if (index * 2 + rowIndex >= parkingLots.length) {
       return Expanded(child: Container());
     }
+
+    for (int i = 0; i < parkingLots.length; i++) {
+      sumEarningsToday += parkingLots[i].earningsToday;
+      sumCurEarnings += parkingLots[i].curEarnings;
+    }
+
     return Expanded(
         child: GestureDetector(
       onTap: () {
@@ -369,6 +406,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                           onPressed: () {
                             setState(() {
                               parkingLots.removeAt(index * 2 + rowIndex);
+                              deleteparking(parkingLots[index * 2 + rowIndex].id);
                             });
                           },
                         ))

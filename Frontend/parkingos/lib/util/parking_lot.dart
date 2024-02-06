@@ -1,4 +1,5 @@
 class ParkingLot {
+  late String id;
   late String name;
   late String address;
   late int capacity;
@@ -11,7 +12,8 @@ class ParkingLot {
   late String operatingHours;
 
   ParkingLot(
-      {required this.name,
+      {this.id = '',
+      required this.name,
       required this.address,
       required this.capacity,
       this.currentOccupancy = 0,
@@ -36,6 +38,7 @@ class ParkingLot {
   }
 
   ParkingLot.fromJson(Map<String, dynamic> json) {
+      id = json['id'] ?? '';
       name = json['name'] ?? '';
       address = json['address'] ?? '';
       capacity = json['capacity'] ?? 0;
@@ -50,6 +53,6 @@ class ParkingLot {
 
   @override
   String toString() {
-    return 'ParkingLot{name: $name, address: $address, capacity: $capacity, currentOccupancy: $currentOccupancy, totalEarnings: $totalEarnings, earningsToday: $earningsToday}';
+    return 'ParkingLot{id: $id, name: $name, address: $address, capacity: $capacity, currentOccupancy: $currentOccupancy, totalEarnings: $totalEarnings, earningsToday: $earningsToday}';
   }
 }
