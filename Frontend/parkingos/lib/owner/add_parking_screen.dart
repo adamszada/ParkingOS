@@ -21,18 +21,27 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
 
    final apiUrl = "http://127.0.0.1:5000/add_parking";
   Future<void> sendPostRequest() async {
-    await http.post(
+    final response = await http.post(
       Uri.parse(apiUrl),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "name": parkingNameController.text,
         "address": parkingAddressController.text,
-        "capacity": double.parse(parkingFloorsController.text) * double.parse(parkingSpotsController.text),
+        "floors": int.parse(parkingFloorsController.text),
+        "spots_per_floor": int.parse(parkingSpotsController.text),
         "dayTariff": double.parse(parkingDTariffController.text),
         "nightTariff": double.parse(parkingNTariffController.text),
         "operatingHours": parkingHoursController.text,
       }),
     );
+    
+    if (response.statusCode == 200) {
+      Navigator.pushNamed(
+                                            context, '/owner');
+      print("Parking added");
+    } else {
+      print("Parking not added");
+    }
   }
 
   @override

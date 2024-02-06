@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/util/parking_cost.dart';
 import 'package:parkingos/util/parking_lot.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ParkingCostsPage extends StatefulWidget {
   final ParkingLot parking;
@@ -13,15 +15,97 @@ class ParkingCostsPage extends StatefulWidget {
       ParkingCostsPageState(parking: this.parking);
 }
 
-List<ParkingCost> costList = [
-  ParkingCost(amount: 35, tittle: "woda", type: "jednorazowy"),
-  ParkingCost(amount: 23, tittle: "światło", type: "jednorazowy"),
-  ParkingCost(amount: 25, tittle: "gwoździe", type: "cykliczny"),
-];
-
 class ParkingCostsPageState extends State<ParkingCostsPage> {
   final ParkingLot parking;
   ParkingCostsPageState({required this.parking});
+  TextEditingController tittleController = TextEditingController();
+  TextEditingController typeController = TextEditingController();
+  TextEditingController amountController = TextEditingController();
+
+  List<ParkingCost> costList = [];
+
+  Future<void> fetchParkingCosts() async {
+    final apiUrl = "http://127.0.0.1:5000/parking_costs/${parking.id}";
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        costList = (data['parking_costs'] as List)
+            .map((json) => ParkingCost.fromJson(json))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load parking costs');
+    }
+  }
+
+  Future<void> deleteParkingCost(int costId) async {
+    final apiUrl = "http://127.0.0.1:5000/parking_costs/delete/${parking.id}";
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "amount": costList[costId].amount,
+        "title": costList[costId].tittle,
+        "type": costList[costId].type,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      fetchParkingCosts();
+    } 
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchParkingCosts();
+  }
+
+  Future<void> addParkingCost() async {
+    final apiUrl = "http://127.0.0.1:5000/parking_costs/add";
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "parking_id": parking.id,
+        "amount": double.parse(amountController.text),
+        "title": tittleController.text,
+        "type": typeController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      costList.add(ParkingCost(
+        amount: double.parse(amountController.text),
+        tittle: tittleController.text,
+        type: typeController.text,
+      ));
+      tittleController.clear();
+      typeController.clear();
+      amountController.clear();
+      setState(() {});
+    } else {
+      final responseBody = jsonDecode(response.body);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(responseBody["message"]),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double sumCosts = 0;
@@ -29,9 +113,6 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
       sumCosts += costList[i].amount;
     }
 
-    TextEditingController tittleController = TextEditingController();
-    TextEditingController typeController = TextEditingController();
-    TextEditingController amountController = TextEditingController();
     return SafeArea(
       child: Expanded(
         child: Padding(
@@ -225,6 +306,7 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
                                               .toStringAsFixed(2)),
                                       tittle: tittleController.text,
                                       type: typeController.text));
+                                  addParkingCost();
                                   setState(() {});
                                 }
                               },
@@ -319,7 +401,8 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
                       ),
                       IconButton(
                           onPressed: () {
-                            costList.removeAt(index);
+                            deleteParkingCost(index);
+                            // costList.removeAt(index);
                             setState(() {});
                           },
                           padding: EdgeInsets.zero,
