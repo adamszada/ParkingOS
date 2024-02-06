@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:parkingos/parking/parking_costs_page.dart';
+import 'package:parkingos/parking/parking_live_view_page.dart';
+import 'package:parkingos/parking/parking_statistics.dart';
+import 'package:parkingos/parking/parking_summary_page.dart';
 import 'package:parkingos/parking/parking_users_page.dart';
 import 'package:parkingos/parking/this_parking_page.dart';
 import 'package:parkingos/util/parking_lot.dart';
@@ -21,9 +25,10 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
     final tabs = [
       ThisParkingPage(parking: parking),
       ParkingUsersPage(parking: parking),
-      Container(color: Colors.green),
-      Container(color: Colors.yellow),
-      Container(color: Colors.white),
+      ParkingLiveViewPage(parking: parking),
+      ParkingCostsPage(parking: parking),
+      ParkingStatisticsPage(parking: parking),
+      ParkingSummaryPage(parking: parking)
     ];
     return Scaffold(
       extendBody: true,
@@ -139,6 +144,7 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
                         buildNavigationItem("live view", 2),
                         buildNavigationItem("koszty", 3),
                         buildNavigationItem("statystyki", 4),
+                        buildNavigationItem("podsumowanie", 5),
                         Expanded(child: Container())
                       ],
                     ),
