@@ -2,35 +2,41 @@ import random
 
 from flask import jsonify, request
 from app import app, db
-from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim(user_agent="parking_locator")
+
 
 @app.route("/add_parking", methods=["POST"])
 def add_parking():
     if request.method == "POST":
-
         data = request.json
-        if not all(key in data for key in ['name', 'address', 'capacity', 'currentOccupancy', 'totalEarnings',
-                                           'earningsToday', 'curEarnings', 'dayTariff', 'nightTariff', 'operatingHours',
-                                           'dayTariffStartHour', 'nightTariffStartHour']):
+        if not all(key in data for key in
+                   ['name', 'address', 'floors', 'spots_per_floor', 'dayTariff', 'nightTariff', 'operatingHours']):
             return jsonify({"message": "Missing required fields."}), 400
 
         name = data.get("name")
         address = data.get("address")
-        capacity = data.get("capacity")
-        currentOccupancy = data.get('currentOccupancy')
-        totalEarnings = data.get('totalEarnings')
-        earningsToday = data.get('earningsToday')
-        curEarnings = data.get('curEarnings')
+        floors = int(data.get("floors"))
+        spots_per_floor = int(data.get("spots_per_floor"))
         dayTariff = data.get("dayTariff")
         nightTariff = data.get("nightTariff")
         operatingHours = data.get("operatingHours")
-        dayTariffStartHour = data.get("dayTariffStartHour")
-        nightTariffStartHour = data.get("nightTariffStartHour")
-        lon = random.uniform(-90, 90)
-        lat = random.uniform(-90, 90)
+
+        if floors <= 0 or spots_per_floor <= 0 or dayTariff <= 0 or nightTariff <= 0:
+            return jsonify({"message": "Invalid field values. Values must be greater than zero."}), 400
 
         try:
-            # Create a new document in the 'Cars' collection
+            location = geolocator.geocode(address)
+            if location:
+                lat = location.latitude
+                lon = location.longitude
+            else:
+                lat = random.uniform(-90, 90)
+                lon = random.uniform(-180, 180)
+
+            capacity = floors * spots_per_floor
+
             jsonFile = {
                 "name": name,
                 "address": address,
@@ -38,18 +44,18 @@ def add_parking():
                 "dayTariff": dayTariff,
                 "nightTariff": nightTariff,
                 "operatingHours": operatingHours,
-                "dayTariffStartHour": dayTariffStartHour,
-                "nightTariffStartHour": nightTariffStartHour,
                 "lon": lon,
                 "lat": lat
             }
             db.collection("ParkingLots").add(jsonFile)
+
             return jsonify({"message": "Parking added successfully."}), 200
 
         except Exception as e:
             return jsonify({"message": f"Error adding parking: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
 
 @app.route("/delete_parking/<parking_id>", methods=["DELETE"])
 def delete_parking_lot(parking_id):
@@ -67,6 +73,7 @@ def delete_parking_lot(parking_id):
             return jsonify({"message": f"Error deleting parking lot: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
 
 @app.route("/get_parking_lots", methods=["GET"])
 def get_parking_lots():
@@ -139,12 +146,12 @@ def getCheapestParkingLots():
 
         try:
             parking_lots = db.collection("ParkingLots").get()
-            result_parkings =[]
+            result_parkings = []
             for parking_lot in parking_lots:
                 parking_data = parking_lot.to_dict()
                 dayTariff = parking_data.get("dayTariff")
                 nightTariff = parking_data.get("nightTariff")
-                avgTariff = (dayTariff+nightTariff)/2
+                avgTariff = (dayTariff + nightTariff) / 2
                 parking_data["avgTariff"] = avgTariff
                 result_parkings.append(parking_data)
             sorted_parkings = sorted(result_parkings, key=lambda x: x["avgTariff"])
@@ -152,5 +159,79 @@ def getCheapestParkingLots():
 
         except Exception as e:
             return jsonify({"message": f"Error getting parking lots: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+
+@app.route("/parking_costs/add", methods=["POST"])
+def add_parking_cost():
+    if request.method == "POST":
+        try:
+            data = request.json
+            if not all(key in data for key in ['parking_id', 'amount', 'title', 'type']):
+                return jsonify({"message": "Missing required fields."}), 400
+
+            parking_id = data.get("parking_id")
+            amount = data.get("amount")
+            title = data.get("title")
+            cost_type = data.get("type")
+
+            if not isinstance(amount, (int, float)) or amount <= 0:
+                return jsonify({"message": "Invalid amount. Amount must be a positive number."}), 400
+
+            db.collection("parking_costs").add(data)
+            return jsonify({"message": "Parking cost added successfully."}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error adding parking cost: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+
+@app.route("/parking_costs/<string:parking_id>", methods=["GET"])
+def get_parking_costs(parking_id):
+    if request.method == "GET":
+        try:
+            costs_ref = db.collection("parking_costs").where("parking_id", "==", parking_id).get()
+
+            parking_costs = []
+
+            for cost in costs_ref:
+                parking_costs.append(cost.to_dict())
+
+            return jsonify({"parking_costs": parking_costs}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error getting parking costs: {str(e)}"}), 500
+    return jsonify({"message": "Invalid request method."}), 405
+
+
+
+@app.route("/parking_costs/delete/<string:parking_id>", methods=["DELETE"])
+def delete_parking_cost(parking_id):
+    if request.method == "DELETE":
+        try:
+            data = request.json
+            title = data.get("title")
+            amount = data.get("amount")
+            cost_type = data.get("type")
+
+            if not all([title, amount, cost_type]):
+                return jsonify({"message": "Missing required fields."}), 400
+
+            costs_ref = db.collection("parking_costs").where("parking_id", "==", parking_id).where("title", "==",
+                                                                                                   title).where(
+                "amount", "==", amount).where("type", "==", cost_type).get()
+
+            if len(costs_ref) == 0:
+                return jsonify({"message": "Parking cost not found."}), 404
+
+            for cost in costs_ref:
+                cost.reference.delete()
+
+            return jsonify({"message": "Parking cost deleted successfully."}), 200
+
+        except Exception as e:
+                return jsonify({"message": f"Error getting parking costs: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
