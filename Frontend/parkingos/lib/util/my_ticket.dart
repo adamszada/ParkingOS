@@ -7,6 +7,7 @@ class MyTicket {
   int floor;
   double moneyDue;
   String qrCode;
+  String parkingId;
 
   MyTicket({
     required this.registration,
@@ -17,6 +18,7 @@ class MyTicket {
     required this.floor,
     required this.moneyDue,
     required this.qrCode,
+    required this.parkingId,
   });
 
   @override

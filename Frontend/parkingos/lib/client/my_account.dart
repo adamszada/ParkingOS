@@ -19,6 +19,7 @@ List<MyTicket> tickets = [
     floor: 3,
     moneyDue: 5.00,
     qrCode: 'QR123ABC',
+    parkingId: 'xd'
   ),
   MyTicket(
     registration: 'XYZ456',
@@ -29,6 +30,7 @@ List<MyTicket> tickets = [
     floor: 2,
     moneyDue: 7.50,
     qrCode: 'QR456XYZ',
+    parkingId: 'xd'
   ),
   MyTicket(
     registration: 'DEF789',
@@ -39,6 +41,7 @@ List<MyTicket> tickets = [
     floor: 1,
     moneyDue: 3.75,
     qrCode: 'QR789DEF',
+    parkingId: 'xd'
   ),
   MyTicket(
     registration: 'ABC123',
@@ -49,6 +52,7 @@ List<MyTicket> tickets = [
     floor: 3,
     moneyDue: 5.00,
     qrCode: 'QR123ABC',
+    parkingId: 'xd'
   ),
   MyTicket(
     registration: 'XYZ456',
@@ -59,6 +63,7 @@ List<MyTicket> tickets = [
     floor: 2,
     moneyDue: 7.50,
     qrCode: 'QR456XYZ',
+    parkingId: 'xd'
   ),
   MyTicket(
     registration: 'DEF789',
@@ -69,6 +74,7 @@ List<MyTicket> tickets = [
     floor: 1,
     moneyDue: 3.75,
     qrCode: 'QR789DEF',
+    parkingId: 'xd'
   ),
 ];
 
