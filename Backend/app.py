@@ -188,7 +188,7 @@ def update_exit_date(ticket_id):
 
     return jsonify({"message": "Invalid request method."}), 405
 
-from routes import cars, parking, parkingSpace, fill_base, statistics
+from routes import cars, parking, parkingSpace, clear_database, statistics
 
 @app.route("/delete_all_users", methods=["POST"])
 def delete_all_users():
