@@ -46,7 +46,12 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (response.statusCode == 200) {
+
+        Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+        globals.userID = jsonResponse['user_id'];
         globals.currentUser = emailController.text;
+
         print("User successfully logged in.");
         Navigator.pushNamed(context, '/home');
       } else if (response.statusCode == 400) {

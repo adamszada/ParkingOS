@@ -32,7 +32,7 @@ Future<void> deleteCar(String registration) async {
 }
 
 Future<List<Vehicle>> getVehicles(String ownerId) async {
-  var url = Uri.parse("http://127.0.0.1:5000/get_cars?owner_id=$ownerId");
+  var url = Uri.parse("http://127.0.0.1:5000/get_cars_by_owner/" + ownerId);
   final response =
       await http.get(url, headers: {"Content-Type": "application/json"});
   if (response.statusCode == 200) {
@@ -75,12 +75,12 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         "brand": brandController.text.toUpperCase(),
         "model": modelController.text.toUpperCase(),
         "registration": registrationController.text.toUpperCase(),
-        "owner_id": globals.currentUser,
+        "owner_id": globals.userID,
       }),
     );
   }
 
-  Future<List<Vehicle>> vehiclesFuture = getVehicles(globals.currentUser);
+  Future<List<Vehicle>> vehiclesFuture = getVehicles(globals.userID);
 
 
 
