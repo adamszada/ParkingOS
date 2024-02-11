@@ -13,7 +13,7 @@ def add_car():
         if not all(isinstance(data[key], str) for key in ['brand', 'model', 'registration', 'owner_id']):
             return jsonify({"message": "Invalid data types for fields."}), 400
 
-        existing_car = db.collection('Cars').where('registration', '==', data['registration']).get()
+        existing_car = db.collection('Cars').where('registration', '==', data['registration']).limit(1).get()
         if existing_car:
             return jsonify({"message": "Car with this registration already exists."}), 409
 
@@ -65,10 +65,14 @@ def delete_car(registration):
 def get_cars():
     if request.method == "GET":
         try:
-            cars_collection = db.collection('Cars').stream()
+            owner_id = request.args.get('owner_id')
+            if owner_id:
+                cars_query = db.collection('Cars').where('owner_id', '==', owner_id).stream()
+            else:
+                return jsonify({"message": "Car not found."}), 404
 
             cars_data = []
-            for car_doc in cars_collection:
+            for car_doc in cars_query:
                 carID = car_doc.id
                 car_data = car_doc.to_dict()
                 car_data['id'] = carID
