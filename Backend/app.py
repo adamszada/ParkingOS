@@ -8,6 +8,7 @@ from flask_cors import CORS
 import re
 
 
+
 app = Flask(__name__)
 CORS(app)
 cred = credentials.Certificate("credentials.json")
@@ -57,10 +58,11 @@ def login():
 
         if not is_valid_email(email):
             return jsonify({"message": "Invalid email format."}), 400
-
+        # Todo logoawnie nie działa, hasło jest nie sprwdzane!!!!!!!!!!
         try:
             user = auth.get_user_by_email(email)
-            return jsonify({"message": "User successfully logged in."}), 200
+            return jsonify({"message": "User successfully logged in.",
+                            "user_id": user.uid}), 200
         except auth.UserNotFoundError:
             return jsonify({"message": "User with provided email does not exist."}), 400
 
