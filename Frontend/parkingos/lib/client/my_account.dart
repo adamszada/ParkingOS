@@ -88,7 +88,7 @@ Future<double> getUserBalance() async {
     // Check if 'saldo' exists and is a number, then convert to double as needed.
     if (data != null && data.containsKey('saldo')) {
       // Use 'num' to ensure compatibility with int and double, then convert to double.
-      final double saldo = double.parse(data['saldo']);
+      final double saldo = double.parse(data['saldo'].toString());
       return saldo;
     } else {
       throw Exception('Invalid JSON data: saldo key not found');
