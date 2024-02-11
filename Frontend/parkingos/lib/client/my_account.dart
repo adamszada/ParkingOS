@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:html';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:parkingos/util/my_ticket.dart';
 import '../globals.dart' as globals;
+import 'package:http/http.dart' as http;
 
 class MyAccount extends StatefulWidget {
   const MyAccount({super.key});
@@ -11,72 +16,88 @@ class MyAccount extends StatefulWidget {
 
 List<MyTicket> tickets = [
   MyTicket(
-    registration: 'ABC123',
-    carName: 'Toyota Corolla',
-    parkTime: DateTime.now().subtract(Duration(hours: 2)),
-    parkingAddress: '123 Main St',
-    parkingSpotNumber: 1,
-    floor: 3,
-    moneyDue: 5.00,
-    qrCode: 'QR123ABC',
-    parkingId: 'xd'
-  ),
+      registration: 'ABC123',
+      carName: 'Toyota Corolla',
+      parkTime: DateTime.now().subtract(Duration(hours: 2)),
+      parkingAddress: '123 Main St',
+      parkingSpotNumber: 1,
+      floor: 3,
+      moneyDue: 5.00,
+      qrCode: 'QR123ABC',
+      parkingId: 'xd'),
   MyTicket(
-    registration: 'XYZ456',
-    carName: 'Honda Civic',
-    parkTime: DateTime.now().subtract(Duration(hours: 3)),
-    parkingAddress: '456 Elm St',
-    parkingSpotNumber: 15,
-    floor: 2,
-    moneyDue: 7.50,
-    qrCode: 'QR456XYZ',
-    parkingId: 'xd'
-  ),
+      registration: 'XYZ456',
+      carName: 'Honda Civic',
+      parkTime: DateTime.now().subtract(Duration(hours: 3)),
+      parkingAddress: '456 Elm St',
+      parkingSpotNumber: 15,
+      floor: 2,
+      moneyDue: 7.50,
+      qrCode: 'QR456XYZ',
+      parkingId: 'xd'),
   MyTicket(
-    registration: 'DEF789',
-    carName: 'Ford Focus',
-    parkTime: DateTime.now().subtract(Duration(hours: 1, minutes: 30)),
-    parkingAddress: '789 Maple Ave',
-    parkingSpotNumber: 27,
-    floor: 1,
-    moneyDue: 3.75,
-    qrCode: 'QR789DEF',
-    parkingId: 'xd'
-  ),
+      registration: 'DEF789',
+      carName: 'Ford Focus',
+      parkTime: DateTime.now().subtract(Duration(hours: 1, minutes: 30)),
+      parkingAddress: '789 Maple Ave',
+      parkingSpotNumber: 27,
+      floor: 1,
+      moneyDue: 3.75,
+      qrCode: 'QR789DEF',
+      parkingId: 'xd'),
   MyTicket(
-    registration: 'ABC123',
-    carName: 'Toyota Corolla',
-    parkTime: DateTime.now().subtract(Duration(hours: 2)),
-    parkingAddress: '123 Main St',
-    parkingSpotNumber: 1,
-    floor: 3,
-    moneyDue: 5.00,
-    qrCode: 'QR123ABC',
-    parkingId: 'xd'
-  ),
+      registration: 'ABC123',
+      carName: 'Toyota Corolla',
+      parkTime: DateTime.now().subtract(Duration(hours: 2)),
+      parkingAddress: '123 Main St',
+      parkingSpotNumber: 1,
+      floor: 3,
+      moneyDue: 5.00,
+      qrCode: 'QR123ABC',
+      parkingId: 'xd'),
   MyTicket(
-    registration: 'XYZ456',
-    carName: 'Honda Civic',
-    parkTime: DateTime.now().subtract(Duration(hours: 3)),
-    parkingAddress: '456 Elm St',
-    parkingSpotNumber: 15,
-    floor: 2,
-    moneyDue: 7.50,
-    qrCode: 'QR456XYZ',
-    parkingId: 'xd'
-  ),
+      registration: 'XYZ456',
+      carName: 'Honda Civic',
+      parkTime: DateTime.now().subtract(Duration(hours: 3)),
+      parkingAddress: '456 Elm St',
+      parkingSpotNumber: 15,
+      floor: 2,
+      moneyDue: 7.50,
+      qrCode: 'QR456XYZ',
+      parkingId: 'xd'),
   MyTicket(
-    registration: 'DEF789',
-    carName: 'Ford Focus',
-    parkTime: DateTime.now().subtract(Duration(hours: 1, minutes: 30)),
-    parkingAddress: '789 Maple Ave',
-    parkingSpotNumber: 27,
-    floor: 1,
-    moneyDue: 3.75,
-    qrCode: 'QR789DEF',
-    parkingId: 'xd'
-  ),
+      registration: 'DEF789',
+      carName: 'Ford Focus',
+      parkTime: DateTime.now().subtract(Duration(hours: 1, minutes: 30)),
+      parkingAddress: '789 Maple Ave',
+      parkingSpotNumber: 27,
+      floor: 1,
+      moneyDue: 3.75,
+      qrCode: 'QR789DEF',
+      parkingId: 'xd'),
 ];
+
+Future<double> getUserBalance() async {
+  // Use string interpolation for cleaner URL construction.
+  var url = Uri.parse("http://127.0.0.1:5000/get_user/" + globals.currentUser);
+  final response =
+      await http.get(url, headers: {"Content-Type": "application/json"});
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body) as Map<String, dynamic>;
+    // Check if 'saldo' exists and is a number, then convert to double as needed.
+    if (data != null && data.containsKey('saldo')) {
+      // Use 'num' to ensure compatibility with int and double, then convert to double.
+      final double saldo = double.parse(data['saldo']);
+      return saldo;
+    } else {
+      throw Exception('Invalid JSON data: saldo key not found');
+    }
+  } else {
+    throw Exception(
+        'Failed to load balance with status code ${response.statusCode}');
+  }
+}
 
 class _MyAccountState extends State<MyAccount> {
   String extractUsernameFromEmail(String email) {
@@ -87,6 +108,8 @@ class _MyAccountState extends State<MyAccount> {
       return email;
     }
   }
+
+  Future<double> balance = getUserBalance();
 
   @override
   Widget build(BuildContext context) {
@@ -228,15 +251,34 @@ class _MyAccountState extends State<MyAccount> {
                                     fontWeight: FontWeight.w900,
                                     fontFamily: 'Jaldi'),
                               ),
-                              Text(
-                                "[saldo] zł",
-                                style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.height / 15,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w900,
-                                    fontFamily: 'Jaldi'),
-                              ),
+                              FutureBuilder(
+                                  future: balance,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child:
+                                              Text("Error: ${snapshot.error}"));
+                                    } else if (snapshot.hasData) {
+                                      return Text(
+                                        snapshot.data.toString(),
+                                        style: TextStyle(
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                15,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w900,
+                                            fontFamily: 'Jaldi'),
+                                      );
+                                    } else {
+                                      return Center(
+                                          child: Text("No parkings found"));
+                                    }
+                                  }),
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
                                 child: Row(
