@@ -109,7 +109,7 @@ def top_up_balance():
         current_balance = round(get_user_balance(user_id), 2)
 
         # Zwiększ saldo o podaną kwotę
-        new_balance = current_balance + amount
+        new_balance = amount #current_balance + amount
 
         # Zapisz nowe saldo w profilu użytkownika
         auth.set_custom_user_claims(user_id, {"saldo": new_balance})
