@@ -40,11 +40,15 @@ def register():
         except auth.UserNotFoundError:
             try:
                 user = auth.create_user(email=email, password=password)
+                auth.set_custom_user_claims(user.uid, {"saldo": 0})
                 return jsonify({"message": "User successfully registered."}), 200
             except auth.AuthError as e:
                 return jsonify({"message": f"Error registering user: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
+
+
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
