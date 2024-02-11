@@ -22,6 +22,40 @@ def clear_database_from_cars():
     return jsonify({"message": "Invalid request method."}), 405
 
 
+@app.route("/clear_database_from_parking_spaces", methods=["POST"])
+def clear_database_from_parking_spaces():
+    if request.method == "POST":
+        try:
+            spaces_collection = db.collection('ParkingSpaces')
+            spaces = spaces_collection.stream()
+            for space in spaces:
+                space.reference.delete()
+
+            return jsonify({"message": "Database cleared successfully."}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error clearing the database: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+
+@app.route("/clear_database_from_tickets", methods=["POST"])
+def clear_database_from_tickets():
+    if request.method == "POST":
+        try:
+            ticket_collection = db.collection('Tickets')
+            tickets = ticket_collection.stream()
+            for ticket in tickets:
+                ticket.reference.delete()
+
+            return jsonify({"message": "Database cleared successfully."}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error clearing the database: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+
 @app.route("/clear_database_from_parking_lots", methods=["POST"])
 def clear_database_from_parking_lots():
     if request.method == "POST":

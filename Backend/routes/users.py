@@ -21,7 +21,6 @@ def get_users():
     return jsonify({"message": "Invalid request method."}), 405
 
 
-
 @app.route("/users", methods=["GET"])
 def get_all_users_with_balances():
     try:

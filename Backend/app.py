@@ -16,6 +16,7 @@ db = firestore.client()
 
 # --- main ---
 
+
 def is_valid_email(email):
     pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     return re.match(pattern, email)
@@ -46,8 +47,6 @@ def register():
                 return jsonify({"message": f"Error registering user: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
-
-
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -104,6 +103,7 @@ def reset_password():
 
     return jsonify({"message": "Invalid request method."}), 405
 
+
 @app.route("/change_email", methods=["POST"])
 def change_email():
     if request.method == "POST":
@@ -122,6 +122,7 @@ def change_email():
 
     return jsonify({"message": "Invalid request method."}), 405
 
+
 @app.route("/change_password", methods=["POST"])
 def change_password():
     if request.method == "POST":
@@ -139,6 +140,7 @@ def change_password():
             return jsonify({"message": f"Error changing password: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
 
 @app.route("/add_ticket", methods=["POST"])
 def add_ticket():
@@ -170,6 +172,25 @@ def add_ticket():
             return jsonify({"message": f"Error adding ticket: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
+
+@app.route("/tickets", methods=["GET"])
+def get_all_tickets():
+    try:
+        # Pobierz wszystkie bilety z kolekcji 'Tickets'
+        tickets_query = db.collection('Tickets').stream()
+
+        tickets_data = []
+        for ticket_doc in tickets_query:
+            ticket_data = ticket_doc.to_dict()
+            ticket_data['id'] = ticket_doc.id
+            tickets_data.append(ticket_data)
+
+        return jsonify({"tickets": tickets_data}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error retrieving tickets: {str(e)}"}), 500
+
 
 @app.route("/update_exit_date/<ticket_id>", methods=["PATCH"])
 def update_exit_date(ticket_id):
