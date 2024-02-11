@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:parkingos/util/vehicle.dart';
 import 'package:http/http.dart' as http;
+import '../globals.dart' as globals;
+
 
 class AddVehiclePage extends StatefulWidget {
   const AddVehiclePage({super.key});
@@ -29,8 +31,8 @@ Future<void> deleteCar(String registration) async {
   }
 }
 
-Future<List<Vehicle>> getVehicles() async {
-  var url = Uri.parse("http://127.0.0.1:5000/get_cars");
+Future<List<Vehicle>> getVehicles(String ownerId) async {
+  var url = Uri.parse("http://127.0.0.1:5000/get_cars?owner_id=$ownerId");
   final response =
       await http.get(url, headers: {"Content-Type": "application/json"});
   if (response.statusCode == 200) {
@@ -39,11 +41,9 @@ Future<List<Vehicle>> getVehicles() async {
       final List<dynamic> carsList = data['cars'];
       return carsList.map((e) => Vehicle.fromJson(e)).toList();
     } else {
-      // Handle missing or invalid JSON data
       throw Exception('Invalid JSON data');
     }
   } else {
-    // Handle error or return an empty list
     throw Exception('Failed to load vehicles');
   }
 }
@@ -75,11 +75,12 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         "brand": brandController.text.toUpperCase(),
         "model": modelController.text.toUpperCase(),
         "registration": registrationController.text.toUpperCase(),
+        "owner_id": globals.currentUser,
       }),
     );
   }
 
-  Future<List<Vehicle>> vehiclesFuture = getVehicles();
+  Future<List<Vehicle>> vehiclesFuture = getVehicles(globals.currentUser);
 
 
 
