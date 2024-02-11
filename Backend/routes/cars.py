@@ -65,7 +65,7 @@ def delete_car(registration):
 def get_cars():
     if request.method == "GET":
         try:
-            owner_id = request.args.get('owner_id')
+            owner_id = request.json.get('owner_id')
             if owner_id:
                 cars_query = db.collection('Cars').where('owner_id', '==', owner_id).stream()
             else:
@@ -135,4 +135,45 @@ def get_car_by_registration(registration):
         except Exception as e:
             return jsonify({"message": f"Error fetching car: {str(e)}"}), 500
 
+    return jsonify({"message": "Invalid request method."}), 405
+
+
+@app.route("/get_car_ids", methods=["GET"])
+def get_car_ids():
+    if request.method == "GET":
+        try:
+            owner_id = request.args.get('owner_id')
+            if owner_id:
+                cars_query = db.collection('Cars').where('owner_id', '==', owner_id).stream()
+            else:
+                cars_query = db.collection('Cars').stream()
+
+            car_ids = []
+            for car_doc in cars_query:
+                carID = car_doc.id
+                car_ids.append(carID)
+
+            return jsonify({"car_ids": car_ids}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error retrieving car IDs: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+
+@app.route("/get_all_cars_in_app")
+def get_all_cars_in_app():
+    if request.method == "GET":
+        try:
+            cars_collection = db.collection('Cars').stream()
+            cars_data = []
+            for car_doc in cars_collection:
+                carID = car_doc.id
+                car_data = car_doc.to_dict()
+                car_data['id'] = carID
+                cars_data.append(car_data)
+
+            return jsonify({"cars": cars_data}), 200
+        except Exception as e:
+            return jsonify({"message": f"Error retrieving cars: {str(e)}"}), 500
     return jsonify({"message": "Invalid request method."}), 405
