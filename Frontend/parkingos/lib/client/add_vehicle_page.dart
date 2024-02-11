@@ -75,7 +75,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         "brand": brandController.text.toUpperCase(),
         "model": modelController.text.toUpperCase(),
         "registration": registrationController.text.toUpperCase(),
-        "owner_id": globals.currentUser,
+        "owner_id": globals.userID,
       }),
     );
   }
