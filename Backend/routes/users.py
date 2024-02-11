@@ -98,7 +98,7 @@ def top_up_balance():
         if not email or not amount:
             return jsonify({"message": "Email and amount are required."}), 400
 
-        amount = max(round(amount, 2),0)
+        amount = max(round(float(amount), 2), float(0))
         # Sprawdź czy użytkownik istnieje
         user = auth.get_user_by_email(email)
 
@@ -106,13 +106,13 @@ def top_up_balance():
         user_id = user.uid
 
         # Pobierz aktualne saldo użytkownika
-        current_balance = round(get_user_balance(user_id), 2)
+        current_balance = float(round(get_user_balance(user_id), 2))
 
         # Zwiększ saldo o podaną kwotę
-        new_balance = amount #current_balance + amount
+        new_balance = amount + current_balance
 
         # Zapisz nowe saldo w profilu użytkownika
-        auth.set_custom_user_claims(user_id, {"saldo": new_balance})
+        auth.set_custom_user_claims(user_id, {"saldo": float(new_balance)})
 
         return jsonify({"message": f"Successfully topped up user balance. New balance: {new_balance}"}), 200
     except auth.AuthError as e:
