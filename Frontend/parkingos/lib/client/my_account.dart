@@ -88,7 +88,7 @@ Future<double> getUserBalance() async {
     // Check if 'saldo' exists and is a number, then convert to double as needed.
     if (data != null && data.containsKey('saldo')) {
       // Use 'num' to ensure compatibility with int and double, then convert to double.
-      final double saldo = double.parse(data['saldo']);
+      final double saldo = double.parse(data['saldo'].toString());
       return saldo;
     } else {
       throw Exception('Invalid JSON data: saldo key not found');
@@ -256,7 +256,7 @@ class _MyAccountState extends State<MyAccount> {
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      return Center(
+                                      return const Center(
                                           child: CircularProgressIndicator());
                                     } else if (snapshot.hasError) {
                                       return Center(
@@ -264,7 +264,7 @@ class _MyAccountState extends State<MyAccount> {
                                               Text("Error: ${snapshot.error}"));
                                     } else if (snapshot.hasData) {
                                       return Text(
-                                        snapshot.data.toString(),
+                                        "${snapshot.data} zł",
                                         style: TextStyle(
                                             fontSize: MediaQuery.of(context)
                                                     .size

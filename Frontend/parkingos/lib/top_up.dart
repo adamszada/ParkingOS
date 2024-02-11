@@ -114,8 +114,7 @@ class _TopUpState extends State<TopUp> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         chuj();
-                                        Navigator.pushNamed(
-                                            context, '/myaccount');
+                                        Navigator.pushNamed(context, '/home');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
