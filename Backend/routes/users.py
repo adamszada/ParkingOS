@@ -112,7 +112,7 @@ def top_up_balance():
         new_balance = amount #current_balance + amount
 
         # Zapisz nowe saldo w profilu użytkownika
-        auth.set_custom_user_claims(user_id, {"saldo": new_balance})
+        auth.set_custom_user_claims(user_id, {"saldo": str(new_balance)})
 
         return jsonify({"message": f"Successfully topped up user balance. New balance: {new_balance}"}), 200
     except auth.AuthError as e:
