@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // Dla jsonEncode
+import 'package:parkingos/globals.dart' as globals;
 
 class TopUp extends StatefulWidget {
   const TopUp({super.key});
@@ -8,6 +11,25 @@ class TopUp extends StatefulWidget {
 }
 
 class _TopUpState extends State<TopUp> {
+  TextEditingController balanceControler = TextEditingController();
+  Future<void> chuj() async {
+    print(balanceControler.text);
+    print(globals.currentUser);
+    final response = await http.post(
+      Uri.parse("http://127.0.0.1:5000/topup"),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'email': globals.currentUser,
+          'amount': double.parse(
+              balanceControler.text), // Podmień na odpowiedni kontroler/zmienną
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +96,7 @@ class _TopUpState extends State<TopUp> {
                                   ),
                                 ),
                                 TextField(
+                                  controller: balanceControler,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
@@ -90,6 +113,7 @@ class _TopUpState extends State<TopUp> {
                                         MediaQuery.of(context).size.height / 20,
                                     child: ElevatedButton(
                                       onPressed: () {
+                                        chuj();
                                         Navigator.pushNamed(
                                             context, '/myaccount');
                                       },

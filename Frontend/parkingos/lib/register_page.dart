@@ -37,9 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (isValidEmail(_emailController.text) == false) {
       // Nieprawidłowy adres e-mail
       return;
-      
     }
-    
 
     final String apiUrl = 'http://127.0.0.1:5000/register';
 
@@ -58,8 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     if (response.statusCode == 200) {
-        Navigator.pushNamed(
-                                            context, '/login');
+      Navigator.pushNamed(context, '/login');
     } else if (response.statusCode == 400) {
       // Błąd - użytkownik już istnieje
       print('A user with this email already exists.');
@@ -253,7 +250,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           if (_emailController.text.isNotEmpty &&
                               !isValidEmail(_emailController.text))
-                              Padding(
+                            Padding(
                               padding: const EdgeInsets.only(left: 10),
                               child: Align(
                                 alignment: Alignment.centerLeft,
