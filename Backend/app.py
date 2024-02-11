@@ -188,7 +188,23 @@ def update_exit_date(ticket_id):
 
     return jsonify({"message": "Invalid request method."}), 405
 
-from routes import cars, parking, parkingSpace, fill_base
+from routes import cars, parking, parkingSpace, fill_base, statistics
+
+@app.route("/delete_all_users", methods=["POST"])
+def delete_all_users():
+    try:
+        # Pobierz listę wszystkich użytkowników
+        all_users = auth.list_users()
+
+        # Iteracyjnie usuń każdego użytkownika
+        for user in all_users.users:
+            auth.delete_user(user.uid)
+
+        return {"message": "All users deleted successfully."}, 200
+
+    except Exception as e:
+        return {"message": f"Error deleting users: {str(e)}"}, 500
+
 
 if __name__ == "__main__":
     app.run(port=8080, host="0.0.0.0", debug=True)
