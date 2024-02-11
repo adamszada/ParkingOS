@@ -21,6 +21,7 @@ def get_users():
     return jsonify({"message": "Invalid request method."}), 405
 
 
+
 @app.route("/users", methods=["GET"])
 def get_all_users_with_balances():
     try:
@@ -38,6 +39,30 @@ def get_all_users_with_balances():
         return jsonify({"users": users_data}), 200
     except auth.AuthError as e:
         return jsonify({"message": f"Error retrieving users: {str(e)}"}), 500
+
+
+@app.route("/get_user", methods=["GET"])
+def get_user_by_email():
+    try:
+        # Pobierz adres email z żądania
+        email = request.json.get('email')
+
+        if not email:
+            return jsonify({"message": "Email is required."}), 400
+
+        # Sprawdź czy użytkownik istnieje
+        user = auth.get_user_by_email(email)
+
+        # Zwróć informacje o użytkowniku
+        user_data = {
+            "uid": user.uid,
+            "email": user.email,
+            "saldo": get_user_balance(user.uid)  # Pobierz saldo użytkownika
+        }
+
+        return jsonify(user_data), 200
+    except auth.AuthError as e:
+        return jsonify({"message": f"Error getting user by email: {str(e)}"}), 500
 
 
 @app.route("/topup_id", methods=["POST"])
@@ -65,7 +90,6 @@ def top_up_balance_id():
         return jsonify({"message": f"Successfully topped up user balance. New balance: {new_balance}"}), 200
     except auth.AuthError as e:
         return jsonify({"message": f"Error topping up user balance: {str(e)}"}), 500
-
 
 @app.route("/topup", methods=["POST"])
 def top_up_balance():
@@ -110,3 +134,5 @@ def get_user_balance(uid):
     except auth.AuthError as e:
         print(f"Error retrieving user balance: {str(e)}")
         return 0  # W przypadku błędu, zwróć 0
+
+
