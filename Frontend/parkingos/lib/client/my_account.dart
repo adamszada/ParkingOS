@@ -256,7 +256,7 @@ class _MyAccountState extends State<MyAccount> {
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      return Center(
+                                      return const Center(
                                           child: CircularProgressIndicator());
                                     } else if (snapshot.hasError) {
                                       return Center(
@@ -264,7 +264,7 @@ class _MyAccountState extends State<MyAccount> {
                                               Text("Error: ${snapshot.error}"));
                                     } else if (snapshot.hasData) {
                                       return Text(
-                                        snapshot.data.toString(),
+                                        "${snapshot.data} zł",
                                         style: TextStyle(
                                             fontSize: MediaQuery.of(context)
                                                     .size
