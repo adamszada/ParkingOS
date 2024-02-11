@@ -41,12 +41,9 @@ def get_all_users_with_balances():
         return jsonify({"message": f"Error retrieving users: {str(e)}"}), 500
 
 
-@app.route("/get_user", methods=["GET"])
-def get_user_by_email():
+@app.route("/get_user/<email>", methods=["GET"])
+def get_user_by_email(email):
     try:
-        # Pobierz adres email z żądania
-        email = request.json.get('email')
-
         if not email:
             return jsonify({"message": "Email is required."}), 400
 
