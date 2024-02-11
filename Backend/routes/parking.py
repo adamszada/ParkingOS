@@ -1,6 +1,8 @@
 import random
 
 from flask import jsonify, request
+from geopy.distance import geodesic
+
 from app import app, db
 from geopy.geocoders import Nominatim
 
