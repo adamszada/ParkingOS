@@ -1,5 +1,7 @@
 class ParkingUser {
   String login;
   double balance;
-  ParkingUser({required this.login, required this.balance});
+  bool isBlocked = false;
+  ParkingUser(
+      {required this.login, required this.balance, this.isBlocked = false});
 }

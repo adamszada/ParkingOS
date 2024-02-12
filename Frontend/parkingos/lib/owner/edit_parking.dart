@@ -1,17 +1,23 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:parkingos/util/parking_lot.dart';
 import 'package:http/http.dart' as http;
-class AddParkingScreen extends StatefulWidget {
-  const AddParkingScreen({super.key});
+
+class EditParkingPage extends StatefulWidget {
+  final ParkingLot parking;
+  const EditParkingPage({super.key, required this.parking});
+
 
   @override
-  _AddParkingScreenState createState() => _AddParkingScreenState();
+  EditParkingPageState createState() =>
+      EditParkingPageState(parking: this.parking);
 }
 
-class _AddParkingScreenState extends State<AddParkingScreen> {
-
-   int _totalSpots = 0;
+class EditParkingPageState extends State<EditParkingPage> {
+  final ParkingLot parking;
+  EditParkingPageState({required this.parking});
+  int _totalSpots = 0;
 
   TextEditingController parkingNameController = TextEditingController();
   TextEditingController parkingAddressController = TextEditingController();
@@ -21,7 +27,37 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
   TextEditingController parkingFloorsController = TextEditingController();
   TextEditingController parkingSpotsController = TextEditingController();
 
-   final apiUrl = "http://127.0.0.1:5000/add_parking";
+  @override
+  void initState() {
+    super.initState();
+    _initializeTextControllers();
+  }
+
+  void _initializeTextControllers() {
+    if (parkingNameController.text.isEmpty) {
+      parkingNameController.text = parking.name;
+    }
+    if (parkingAddressController.text.isEmpty) {
+      parkingAddressController.text = parking.address;
+    }
+    if (parkingHoursController.text.isEmpty) {
+      parkingHoursController.text = parking.operatingHours;
+    }
+    if (parkingDTariffController.text.isEmpty) {
+      parkingDTariffController.text = parking.dayTariff.toString();
+    }
+    if (parkingNTariffController.text.isEmpty) {
+      parkingNTariffController.text = parking.nightTariff.toString();
+    }
+    if (parkingFloorsController.text.isEmpty) {
+      parkingFloorsController.text = parking.floors.toString();
+    }
+    if (parkingSpotsController.text.isEmpty) {
+      parkingSpotsController.text = parking.capacityPerFloor.toString();
+    }
+  }
+
+  final apiUrl = "http://127.0.0.1:5000/update_parking/";
   Future<void> sendPostRequest() async {
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -36,19 +72,17 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
         "operatingHours": parkingHoursController.text,
       }),
     );
-    
+
     if (response.statusCode == 200) {
-      Navigator.pushNamed(
-                                            context, '/owner');
-      print("Parking added");
+      Navigator.pushNamed(context, '/owner');
+      print("Parking edited");
     } else {
-      print("Parking not added");
+      print("Parking not edited");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     void _updateTotalSpots() {
       setState(() {
         _totalSpots = (parkingSpotsController.text != ""
@@ -77,7 +111,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      'Dodawanie parkingu',
+                      'Edycja parkingu',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           color: const Color(0xff0C3C61),
@@ -143,7 +177,8 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
-                                                controller: parkingAddressController,
+                                                controller:
+                                                    parkingAddressController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -178,7 +213,8 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
-                                                controller: parkingHoursController,
+                                                controller:
+                                                    parkingHoursController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -219,7 +255,8 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
-                                                controller: parkingDTariffController,
+                                                controller:
+                                                    parkingDTariffController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -254,7 +291,8 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 ),
                                               ),
                                               TextField(
-                                                controller: parkingNTariffController,
+                                                controller:
+                                                    parkingNTariffController,
                                                 decoration: InputDecoration(
                                                   filled: true,
                                                   fillColor: Colors.white,
@@ -405,7 +443,9 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                             child: Text(
                                               _totalSpots > 0
                                                   ? _totalSpots.toString()
-                                                  : "0",
+                                                  : (parking.capacityPerFloor *
+                                                          parking.floors)
+                                                      .toString(),
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,

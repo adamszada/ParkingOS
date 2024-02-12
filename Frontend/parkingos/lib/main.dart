@@ -9,13 +9,14 @@ import 'package:parkingos/client/my_account.dart';
 import 'package:parkingos/owner/add_parking_screen.dart';
 import 'package:parkingos/owner/manage_parking.dart';
 import 'package:parkingos/owner/owner_screen.dart';
+import 'package:parkingos/owner/edit_parking.dart';
 import 'package:parkingos/register_page.dart';
 import 'package:parkingos/account_pass_change.dart';
 import 'package:parkingos/top_up.dart';
 import 'package:parkingos/util/homepage_appbar.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'util/wave_painter.dart';
-
+import '../globals.dart' as globals;
 void main() {
   runApp(const MyApp());
 }
@@ -39,8 +40,16 @@ class MyApp extends StatelessWidget {
         '/topup': (context) => const TopUp(),
         '/changeemail': (context) => const ChangeEmail(),
         '/home': (context) => const BaseScreen(),
-        '/owner': (context) => const OwnerScreen(),
         '/add_parking': (context) => const AddParkingScreen(),
+        '/edit_parking': (context) {
+          final settings = ModalRoute.of(context)!.settings;
+          if (settings.arguments is ParkingLot && globals.currentUser == 'admin@admin.admin') {
+            final parking = settings.arguments as ParkingLot;
+            return EditParkingPage(parking: parking);
+          } else {
+            return const LoginPage();
+          }
+        },
         '/buyTicket': (context) {
           final settings = ModalRoute.of(context)!.settings;
           if (settings.arguments is ParkingLot) {
@@ -50,13 +59,20 @@ class MyApp extends StatelessWidget {
             return const FindParkingPage();
           }
         },
+        '/owner': (context){
+          if (globals.currentUser == 'admin@admin.admin') {
+            return const OwnerScreen();
+          } else {
+            return const LoginPage();
+          }
+        },
         '/manageParking': (context) {
           final settings = ModalRoute.of(context)!.settings;
-          if (settings.arguments is ParkingLot) {
+          if (settings.arguments is ParkingLot && globals.currentUser == 'admin@admin.admin') {
             final parking = settings.arguments as ParkingLot;
             return ManageParkingScreen(parking: parking);
           } else {
-            return const OwnerScreen();
+            return const LoginPage();
           }
         }
       },

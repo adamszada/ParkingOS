@@ -43,7 +43,7 @@ class ThisParkingPageState extends State<ThisParkingPage> {
                       },
                       child: Container(
                         child: Text(
-                          "edytuj",
+                          "",
                           style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height <
                                     MediaQuery.of(context).size.width
