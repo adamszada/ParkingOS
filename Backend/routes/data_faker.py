@@ -5,6 +5,7 @@ import string
 from datetime import datetime, timedelta
 
 import requests
+from faker import Faker
 
 
 def register_random_user(url='http://127.0.0.1:5000/register'):
@@ -167,9 +168,9 @@ def add_random_ticket():
         ticket_data = {
             "userID": user['uid'],
             "registration": car['registration'],
-            "parking_id": "parking123",
+            "parking_id": "2UzF6R7ba7qs8afnJJhP",
             "entry_date": str(enterDate),
-            "place_id": "place456"
+            "parkingSpotNumber": "place456"
         }
         # Convert data to JSON format
         ticket_json = json.dumps(ticket_data)
@@ -185,7 +186,7 @@ def add_random_ticket():
         }
         ej = json.dumps(exit_date)
         result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
-
+        break
 
 def parking_day_cycle(days):
     users_response = requests.get('http://127.0.0.1:5000/users')
@@ -224,10 +225,44 @@ def parking_day_cycle(days):
             result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
             currentDate += timedelta(days=1)
 
+
+def generate_parking():
+
+    fake = Faker()
+    name = fake.company()
+    address = fake.address()
+    floors = random.randint(1, 5)
+    spots_per_floor = random.randint(10, 50)
+    day_tariff = round(random.uniform(5, 20), 2)
+    night_tariff = round(day_tariff * random.uniform(0.5, 0.8), 2)
+    operating_hours = f"{random.randint(0, 23)}:00 - {random.randint(0, 23)}:00"
+
+    parking_data = {
+        "name": name,
+        "address": address,
+        "floors": floors,
+        "spots_per_floor": spots_per_floor,
+        "dayTariff": day_tariff,
+        "nightTariff": night_tariff,
+        "operatingHours": operating_hours
+    }
+
+    return parking_data
+
+def add_parking(number, url="http://127.0.0.1:5000/add_parking"):
+    headers = {'Content-Type': 'application/json'}
+    for i in range(number):
+        parking_data = generate_parking()
+        response = requests.post(url, json=parking_data, headers=headers)
+
+
+
+
 if __name__ == '__main__':
     #fill_database_with_random_users(10)
     #top_up_random_amount_for_all_users()
     #add_random_car_to_every_user()
     #add_random_cars(3)
-    #add_random_ticket()
-    parking_day_cycle(30)
+    add_random_ticket()
+    #parking_day_cycle(30)
+    #add_parking(5)

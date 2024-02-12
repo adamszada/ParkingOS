@@ -1,6 +1,8 @@
 # requirements.txt
-flask
+flask~=3.0.2
 firebase_admin
-python-dotenv
+python-dotenv~=1.0.1
 flask_cors
-geopy
+geopy~=2.4.1
+requests~=2.31.0
+Faker~=23.1.0

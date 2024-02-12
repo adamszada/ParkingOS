@@ -155,8 +155,9 @@ def add_ticket():
         parking_id = data.get('parking_id')
         entry_date = data.get('entry_date')
         # qr_code = data.get('qr_code')
-        place_id = data.get('place_id')
-
+        # Todo generate floor and number based on already taken spots
+        parkingSpotNumber = data.get('parkingSpotNumber')
+        floor = 1
         try:
             # Create a new ticket document in the 'Tickets' collection
             ticket_ref = db.collection('Tickets').document()
@@ -165,9 +166,11 @@ def add_ticket():
                 'registration': registration,
                 'parking_id': parking_id,
                 'entry_date': entry_date,
+                'realized': False,
                 # 'exit_date': exit_date,
-                # 'qr_code': qr_code,
-                'place_id': place_id
+                'QR': None,
+                'floor': floor,
+                'parkingSpotNumber': parkingSpotNumber
             })
 
             ticket_id = ticket_ref.id

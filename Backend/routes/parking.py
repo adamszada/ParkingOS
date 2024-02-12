@@ -237,3 +237,37 @@ def delete_parking_cost(parking_id):
                 return jsonify({"message": f"Error getting parking costs: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
+@app.route("/tickets_data/<userID>", methods=["GET"])
+def user_tickets_data(userID):
+
+    tickets_query = db.collection('Tickets').where("userID","==", userID).stream()
+    tickets_data = []
+    for ticket_doc in tickets_query:
+        ticket = ticket_doc.to_dict()
+
+        car_query = db.collection('Cars').where('registration', '==', ticket['registration']).get()
+        car =  car_query[0].to_dict()
+
+        parking_ref = db.collection('ParkingLots').document(ticket['parking_id'])
+        parking_data = parking_ref.get()
+        parking_doc = parking_data.to_dict()
+        parkingAddress = parking_doc['address']
+
+        #Todo calculate money Due
+        moneyDue = 0
+        ticket_d = {
+            "registration": ticket['registration'],
+            "carName":  car.get('brand'),
+            "parkTime": ticket['entry_date'],
+            "parkingAddress": parkingAddress,
+            "parkingSpotNumber": ticket['parkingSpotNumber'],
+            "floor": ticket['floor'],
+            "moneyDue": moneyDue,
+            "qrCode":  ticket['QR'],
+            "parkingId": ticket['parking_id']
+        }
+        print("Ticket!!!!!!", ticket_d)
+        tickets_data.append(ticket_d)
+
+    return jsonify({"tickets": tickets_data}), 200
