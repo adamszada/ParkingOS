@@ -286,7 +286,7 @@ class _MyAccountState extends State<MyAccount> {
                     Padding(
                       padding: const EdgeInsets.only(left: 15),
                       child: Text(
-                        "Moje pojazdy:",
+                        "Moje bilety:",
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 20,
