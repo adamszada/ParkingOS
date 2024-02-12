@@ -11,6 +11,8 @@ class AddParkingScreen extends StatefulWidget {
 
 class _AddParkingScreenState extends State<AddParkingScreen> {
 
+   int _totalSpots = 0;
+
   TextEditingController parkingNameController = TextEditingController();
   TextEditingController parkingAddressController = TextEditingController();
   TextEditingController parkingHoursController = TextEditingController();
@@ -46,6 +48,23 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    void _updateTotalSpots() {
+      setState(() {
+        _totalSpots = (parkingSpotsController.text != ""
+                        ? int.parse(parkingSpotsController.text)
+                        : 0) *
+                    (parkingFloorsController.text != ""
+                        ? int.parse(parkingFloorsController.text)
+                        : 0) >
+                0
+            ? (int.parse(parkingFloorsController.text) *
+                int.parse(parkingSpotsController.text))
+            : 0;
+      });
+      // Tutaj można dodać logikę wyszukiwania, np. zaktualizować listę wyników.
+    }
+
     return Scaffold(
         body: Padding(
             padding: EdgeInsets.symmetric(
@@ -346,6 +365,9 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 borderSide: BorderSide.none,
                                               ),
                                             ),
+                                            onChanged: (value) {
+                                              _updateTotalSpots();
+                                            },
                                           )),
                                     ),
                                     Expanded(
@@ -363,6 +385,9 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                                 borderSide: BorderSide.none,
                                               ),
                                             ),
+                                            onChanged: (value) {
+                                              _updateTotalSpots();
+                                            },
                                           )),
                                     ),
                                     Expanded(
@@ -378,7 +403,9 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                           child: Expanded(
                                               child: Center(
                                             child: Text(
-                                              "[suma]",
+                                              _totalSpots > 0
+                                                  ? _totalSpots.toString()
+                                                  : "0",
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,

@@ -48,16 +48,14 @@ Future<List<ParkingLot>> getAllParkings() async {
   }
 }
 
-  double sumEarningsToday = 0;
-  double sumCurEarnings = 0;
-class _ParkingsScreenState extends State<ParkingsScreen> {
+double sumEarningsToday = 0;
+double sumCurEarnings = 0;
 
+class _ParkingsScreenState extends State<ParkingsScreen> {
   Future<List<ParkingLot>> parkinglots = getAllParkings();
 
   @override
   Widget build(BuildContext context) {
-
-
     return Column(
       children: [
         SizedBox(
@@ -198,49 +196,50 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
             ],
           ),
         ),
-                Expanded(
-                  child: FutureBuilder<List<ParkingLot>>(
-                    future: parkinglots,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text("Error: ${snapshot.error}"));
-                      } else if (snapshot.hasData) {
-                        return buildParkingLotList(snapshot.data!);
-                      } else {
-                        return Center(child: Text("No parkings found"));
-                      }
-                    },
-                  ),
-                ),
+        Expanded(
+          child: FutureBuilder<List<ParkingLot>>(
+            future: parkinglots,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text("Error: ${snapshot.error}"));
+              } else if (snapshot.hasData) {
+                return buildParkingLotList(snapshot.data!);
+              } else {
+                return Center(child: Text("No parkings found"));
+              }
+            },
+          ),
+        ),
       ],
     );
   }
 
-  Widget buildParkingLotList(List<ParkingLot> parkingLots){
-    return Expanded( 
-                      child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        itemCount: 10,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: Row(
-                              children: [
-                                buildParkingLotItem(parkingLots, index, 0),
-                                buildParkingLotItem(parkingLots, index, 1),
-                              ],
-                            ),
-                          );
-                        },
-                      )),
+  Widget buildParkingLotList(List<ParkingLot> parkingLots) {
+    return Expanded(
+      child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: 10,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                  children: [
+                    buildParkingLotItem(parkingLots, index, 0),
+                    buildParkingLotItem(parkingLots, index, 1),
+                  ],
+                ),
+              );
+            },
+          )),
     );
   }
 
-  Widget buildParkingLotItem(List<ParkingLot> parkingLots, int index, int rowIndex) {
+  Widget buildParkingLotItem(
+      List<ParkingLot> parkingLots, int index, int rowIndex) {
     if (index * 2 + rowIndex >= parkingLots.length) {
       return Expanded(child: Container());
     }
@@ -390,26 +389,64 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                         ),
                       ],
                     ),
-                    Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          child: Text(
-                            "X",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.height / 24,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: 'Jaldi'),
+                                            Positioned(
+                            right:0,
+                            top:0,
+                    child:
+                    Row(
+                      children: [
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              child: Text(
+                                "edytuj",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.height <
+                                    MediaQuery.of(context).size.width
+                                ? MediaQuery.of(context).size.height / 25
+                                : MediaQuery.of(context).size.width / 25,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Jaldi',
+                            fontStyle: FontStyle.italic,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.white,
+                            decorationThickness: 3.0,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              parkingLots.removeAt(index * 2 + rowIndex);
-                              deleteparking(parkingLots[index * 2 + rowIndex].id);
-                            });
-                          },
-                        ))
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  Navigator.pushNamed(
+                                  context,
+                                  '/edit_parking',
+                                  arguments: parkingLots[index * 2 + rowIndex],
+                          );
+                                });
+                              },
+                            )),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              child: Text(
+                                "X",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize:
+                                        MediaQuery.of(context).size.height / 24,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontFamily: 'Jaldi'),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  parkingLots.removeAt(index * 2 + rowIndex);
+                                  //deleteparking(parkingLots[index * 2 + rowIndex].id);
+                                });
+                              },
+                            ))
+                      ],
+                    ))
                   ],
                 ))),
       ),

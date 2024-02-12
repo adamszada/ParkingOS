@@ -53,7 +53,12 @@ class _LoginPageState extends State<LoginPage> {
         globals.currentUser = emailController.text;
 
         print("User successfully logged in.");
-        Navigator.pushNamed(context, '/home');
+        
+        if(globals.currentUser == 'admin@admin.admin')
+          Navigator.pushNamed(context, '/owner');
+        else
+          Navigator.pushNamed(context, '/home');
+        
       } else if (response.statusCode == 400) {
         setState(() {
           errorMessage = 'Nieprawidłowe dane logowania.';
