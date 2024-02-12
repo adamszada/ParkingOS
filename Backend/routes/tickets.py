@@ -105,10 +105,26 @@ def update_exit_date(ticket_id):
     if request.method == "PATCH":
         data = request.json
         exit_date = data.get('exit_date')
-
         try:
             ticket_ref = db.collection('Tickets').document(ticket_id)
+            ticket_data = ticket_ref.get().to_dict()
+            if ticket_data['exit_date'] != None:
+                return jsonify({"message": f"Exit date has been already added: {str(ticket_data['exit_date'])}"}), 406
+
+            parking_ref = db.collection('ParkingLots').document(ticket_data['parking_id'])
+            parking_data = parking_ref.get().to_dict()
+
+            dayTariff = parking_data['dayTariff']
+            nightTariff = parking_data['nightTariff']
+
+            # Todo calculate money Due
+            entry_date = datetime.strptime(ticket_data['entry_date'], '%Y-%m-%d %H:%M:%S.%f')
+            dayh, nightH = calculate_tariffs(entry_date, 6, 22)
+            print(dayh, nightH, dayTariff, nightTariff)
+            moneyDue = dayTariff * dayh + nightTariff * nightH
+
             ticket_ref.update({'exit_date': exit_date})
+            ticket_ref.update({'moneyDue': moneyDue})
 
             return jsonify({"message": "Exit date updated successfully."}), 200
 
@@ -118,19 +134,17 @@ def update_exit_date(ticket_id):
     return jsonify({"message": "Invalid request method."}), 405
 
 
-def get_tariffs(parking_id, entry_time, day_tariff_start_hour, night_tariff_start_hour):
-    try:
-        # Pobierz dane o parkingu
-        parking_ref = db.collection('ParkingLots').document(parking_id)
-        parking_data = parking_ref.get().to_dict()
+def calculate_tariffs(entry_time, day_tariff_start_hour, night_tariff_start_hour, parking_id=0,):
+    # try:
+        # # Pobierz dane o parkingu
+        # parking_ref = db.collection('ParkingLots').document(parking_id)
+        # parking_data = parking_ref.get().to_dict()
 
-        # Pobierz taryfy
-        day_tariff = parking_data.get('dayTariff')
-        night_tariff = parking_data.get('nightTariff')
+        # # Pobierz taryfy
+        # day_tariff = parking_data.get('dayTariff')
+        # night_tariff = parking_data.get('nightTariff')
 
         # Obecny czas
-        current_time = datetime.now()
-
         current_time = datetime.now()
         night_h = 0
         day_h = 0
@@ -142,20 +156,21 @@ def get_tariffs(parking_id, entry_time, day_tariff_start_hour, night_tariff_star
 
             entry_time += timedelta(hours=1)
 
-        return jsonify({
-            "day_tariff": day_tariff,
-            "night_tariff": night_tariff,
-            "hours_in_day_tariff": day_h,
-            "hours_in_night_tariff": night_h
-        }), 200
+        return day_h, night_h
 
-    except Exception as e:
-        return jsonify({"message": f"Error getting tariffs: {str(e)}"}), 500
+    # except Exception as e:
+    #     return jsonify({"message": f"Error getting tariffs: {str(e)}"}), 500
 
 @app.route("/tickets_data/<userID>", methods=["GET"])
 def user_tickets_data(userID):
-
-    tickets_query = db.collection('Tickets').where("userID","==", userID).stream()
+    """
+    returns a list of active tickets for user with
+    :param userID:
+    :return:
+    """
+    tickets_query = db.collection('Tickets').where("userID", "==", userID)\
+                                            .where("realized", "==", False)\
+                                            .where("exit_date", "==", None).stream()
     tickets_data = []
     for ticket_doc in tickets_query:
         ticket = ticket_doc.to_dict()
@@ -167,9 +182,13 @@ def user_tickets_data(userID):
         parking_data = parking_ref.get()
         parking_doc = parking_data.to_dict()
         parkingAddress = parking_doc['address']
-
+        dayTariff = parking_doc['dayTariff']
+        nightTariff = parking_doc['nightTariff']
         #Todo calculate money Due
-        moneyDue = get_tariffs(ticket['parking_id'], )
+        entry_date = datetime.strptime(ticket['entry_date'], '%Y-%m-%d %H:%M:%S.%f')
+        dayh, nightH = calculate_tariffs(entry_date, 6, 22)
+        moneyDue = dayTariff * dayh + nightTariff * nightH,
+
         ticket_d = {
             "registration": ticket['registration'],
             "carName":  car.get('brand'),
@@ -181,7 +200,41 @@ def user_tickets_data(userID):
             "qrCode":  ticket['QR'],
             "parkingId": ticket['parking_id']
         }
-        print("Ticket!!!!!!", ticket_d)
         tickets_data.append(ticket_d)
 
     return jsonify({"tickets": tickets_data}), 200
+
+@app.route("/get_ticket_moneyDue/<ticket_id>", methods=["GET"])
+def get_ticket_moneyDue(ticket_id):
+    if request.method == "PATCH":
+        try:
+            ticket_ref = db.collection('Tickets').document(ticket_id)
+            ticket_data = ticket_ref.get().to_dict()
+            if ticket_data['exit_date'] == None:
+                return jsonify({"message": f"Ticket has no exit date!"}), 406
+
+            if ticket_data['realized']:
+                return jsonify({"message": f"Ticket has already been realized!"}), 407
+
+
+            return jsonify({"message": "Exit date updated successfully."}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error updating exit date: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+@app.route("/change_ticket_status_for_realized/<ticket_id>", methods=["POST"])
+def change_ticket_status_for_Realized(ticket_id):
+    if request.method == "POST":
+        try:
+
+            ticket_ref = db.collection('Tickets').document(ticket_id)
+            ticket_ref.update({'realized': True})
+
+            return jsonify({"message": "Bilet opłacony pomyślnie."}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Błąd płatności biletu: {str(e)}"}), 500
+
+    return jsonify({"message": "Nieprawidłowa metoda żądania."}), 405
