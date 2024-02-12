@@ -10,6 +10,7 @@ class ParkingLot {
   late double dayTariff;
   late double nightTariff;
   late String operatingHours;
+  late int floors = 3;
 
   ParkingLot(
       {this.id = '',
@@ -17,6 +18,7 @@ class ParkingLot {
       required this.address,
       required this.capacity,
       this.currentOccupancy = 0,
+      this.floors = 3,
       this.totalEarnings = 0.0,
       this.earningsToday = 0.0,
       this.curEarnings = 0.0,
@@ -38,17 +40,17 @@ class ParkingLot {
   }
 
   ParkingLot.fromJson(Map<String, dynamic> json) {
-      id = json['id'] ?? '';
-      name = json['name'] ?? '';
-      address = json['address'] ?? '';
-      capacity = json['capacity'] ?? 0;
-      currentOccupancy = json['currentOccupancy'] ?? 0;
-      totalEarnings = json['totalEarnings'] ?? 0.0;
-      earningsToday =  json['earningsToday'] ?? 0.0;
-      curEarnings =  json['curEarnings'] ?? 0.0;
-      dayTariff =  json['dayTariff'] ?? 0.0;
-      nightTariff =  json['nightTariff'] ?? 0.0;
-      operatingHours =  json['operatingHours'] ?? '';
+    id = json['id'] ?? '';
+    name = json['name'] ?? '';
+    address = json['address'] ?? '';
+    capacity = json['capacity'] ?? 0;
+    currentOccupancy = json['currentOccupancy'] ?? 0;
+    totalEarnings = json['totalEarnings'] ?? 0.0;
+    earningsToday = json['earningsToday'] ?? 0.0;
+    curEarnings = json['curEarnings'] ?? 0.0;
+    dayTariff = json['dayTariff'] ?? 0.0;
+    nightTariff = json['nightTariff'] ?? 0.0;
+    operatingHours = json['operatingHours'] ?? '';
   }
 
   @override
