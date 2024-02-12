@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:parkingos/util/my_ticket.dart';
 import '../globals.dart' as globals;
 import 'package:http/http.dart' as http;
@@ -14,68 +12,28 @@ class MyAccount extends StatefulWidget {
   _MyAccountState createState() => _MyAccountState();
 }
 
-List<MyTicket> tickets = [
-  MyTicket(
-      registration: 'ABC123',
-      carName: 'Toyota Corolla',
-      parkTime: DateTime.now().subtract(Duration(hours: 2)),
-      parkingAddress: '123 Main St',
-      parkingSpotNumber: 1,
-      floor: 3,
-      moneyDue: 5.00,
-      qrCode: 'QR123ABC',
-      parkingId: 'xd'),
-  MyTicket(
-      registration: 'XYZ456',
-      carName: 'Honda Civic',
-      parkTime: DateTime.now().subtract(Duration(hours: 3)),
-      parkingAddress: '456 Elm St',
-      parkingSpotNumber: 15,
-      floor: 2,
-      moneyDue: 7.50,
-      qrCode: 'QR456XYZ',
-      parkingId: 'xd'),
-  MyTicket(
-      registration: 'DEF789',
-      carName: 'Ford Focus',
-      parkTime: DateTime.now().subtract(Duration(hours: 1, minutes: 30)),
-      parkingAddress: '789 Maple Ave',
-      parkingSpotNumber: 27,
-      floor: 1,
-      moneyDue: 3.75,
-      qrCode: 'QR789DEF',
-      parkingId: 'xd'),
-  MyTicket(
-      registration: 'ABC123',
-      carName: 'Toyota Corolla',
-      parkTime: DateTime.now().subtract(Duration(hours: 2)),
-      parkingAddress: '123 Main St',
-      parkingSpotNumber: 1,
-      floor: 3,
-      moneyDue: 5.00,
-      qrCode: 'QR123ABC',
-      parkingId: 'xd'),
-  MyTicket(
-      registration: 'XYZ456',
-      carName: 'Honda Civic',
-      parkTime: DateTime.now().subtract(Duration(hours: 3)),
-      parkingAddress: '456 Elm St',
-      parkingSpotNumber: 15,
-      floor: 2,
-      moneyDue: 7.50,
-      qrCode: 'QR456XYZ',
-      parkingId: 'xd'),
-  MyTicket(
-      registration: 'DEF789',
-      carName: 'Ford Focus',
-      parkTime: DateTime.now().subtract(Duration(hours: 1, minutes: 30)),
-      parkingAddress: '789 Maple Ave',
-      parkingSpotNumber: 27,
-      floor: 1,
-      moneyDue: 3.75,
-      qrCode: 'QR789DEF',
-      parkingId: 'xd'),
-];
+Future<List<MyTicket>> getTickets() async {
+  print(globals.userID);
+  var url = Uri.parse("http://127.0.0.1:5000/tickets_data/" + globals.userID);
+  final response =
+      await http.get(url, headers: {"Content-Type": "application/json"});
+  if (response.statusCode == 200) {
+    final Map<String, dynamic>? data = json.decode(response.body);
+    if (data != null && data.containsKey('tickets')) {
+      final List<dynamic> carsList = data['tickets'];
+      print(data['tickets']);
+      return carsList.map((e) => MyTicket.fromJson(e)).toList();
+    } else {
+      // Handle missing or invalid JSON data
+      throw Exception('Invalid JSON data');
+    }
+  } else {
+    // Handle error or return an empty list
+    throw Exception('Failed to load tickets');
+  }
+}
+
+Future<List<MyTicket>> ticketsFuture = getTickets();
 
 Future<double> getUserBalance() async {
   // Use string interpolation for cleaner URL construction.
@@ -319,38 +277,77 @@ class _MyAccountState extends State<MyAccount> {
                   )),
             ),
           ),
-          SizedBox(height: 100),
-          Center(
-              child: SizedBox(
-            width: MediaQuery.of(context).size.width, // Adjust width as needed
-            // height is not specified here to allow the ListView to take up as much space as it needs
-            child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-                child: ListView.builder(
-                  shrinkWrap: true, // Important for ListView in a Column
-                  physics:
-                      NeverScrollableScrollPhysics(), // Disables scrolling within ListView
-                  itemCount: (tickets.length / 3).ceil(), // Adjust item count
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 5),
-                      child: Row(
-                        children: [
-                          buildMyTicketItem(index, 0),
-                          buildMyTicketItem(index, 1),
-                          buildMyTicketItem(index, 2),
-                        ],
+          Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(
+                        "Moje pojazdy:",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.height / 20,
+                            color: const Color(0xFF0C3C61),
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Jaldi'),
                       ),
-                    );
-                  },
-                )),
-          ))
+                    ),
+                  ],
+                ),
+                
+                Row(
+                  children: [
+                    Expanded(
+                      child: FutureBuilder<List<MyTicket>>(
+                        future: ticketsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text("Error: ${snapshot.error}"));
+                          } else if (snapshot.hasData) {
+                            return buildMyTicketList(snapshot.data!);
+                          } else {
+                            return Center(child: Text("No tickets found"));
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ]))
         ])));
   }
 
-  Widget buildMyTicketItem(int index, int rowIndex) {
+  Widget buildMyTicketList(List<MyTicket> tickets) {
+    return Expanded(
+      child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+          child: ListView.builder(
+            shrinkWrap: true, // Important for ListView in a Column
+            physics:
+                NeverScrollableScrollPhysics(), // Disables scrolling within ListView
+            itemCount: (tickets.length / 3).ceil(), // Adjust item count
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Row(
+                  children: [
+                    buildMyTicketItem(tickets, index, 0),
+                    buildMyTicketItem(tickets, index, 1),
+                    buildMyTicketItem(tickets, index, 2),
+                  ],
+                ),
+              );
+            },
+          )),
+    );
+  }
+
+  Widget buildMyTicketItem(List<MyTicket> tickets, int index, int rowIndex) {
     if (index * 3 + rowIndex >= tickets.length) {
       return Expanded(child: Container());
     }

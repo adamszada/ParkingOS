@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/change_email.dart';
+import 'package:parkingos/client/buy_ticket.dart';
+import 'package:parkingos/client/find_parking_page.dart';
 import 'package:parkingos/email_recovery.dart';
 import 'package:parkingos/client/base_screen.dart';
 import 'package:parkingos/login_page.dart';
@@ -39,6 +41,15 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const BaseScreen(),
         '/owner': (context) => const OwnerScreen(),
         '/add_parking': (context) => const AddParkingScreen(),
+        '/buyTicket': (context) {
+          final settings = ModalRoute.of(context)!.settings;
+          if (settings.arguments is ParkingLot) {
+            final parking = settings.arguments as ParkingLot;
+            return BuyTicket(parking: parking);
+          } else {
+            return const FindParkingPage();
+          }
+        },
         '/manageParking': (context) {
           final settings = ModalRoute.of(context)!.settings;
           if (settings.arguments is ParkingLot) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'package:parkingos/util/vehicle.dart';
 import 'package:http/http.dart' as http;
+import '../globals.dart' as globals;
 
 class FindParkingPage extends StatefulWidget {
   const FindParkingPage({super.key});
@@ -13,7 +14,7 @@ class FindParkingPage extends StatefulWidget {
 }
 
 Future<List<Vehicle>> getVehicles() async {
-  var url = Uri.parse("http://127.0.0.1:5000/get_cars");
+  var url = Uri.parse("http://127.0.0.1:5000/get_cars_by_owner/" + globals.userID);
   final response =
       await http.get(url, headers: {"Content-Type": "application/json"});
   if (response.statusCode == 200) {
@@ -440,42 +441,10 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                               fontFamily: 'Jaldi'),
                         ),
                         onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                            return StatefulBuilder(
-            builder: (context, setStateSB) =>   Dialog(
-                                child: Container(
-                                  padding: EdgeInsets.all(
-                                      16), // Adjust padding as needed
-                                  constraints: BoxConstraints(
-                                      maxHeight:
-                                          400), // Set a max height if needed
-                                  child: FutureBuilder<List<Vehicle>>(
-                                    future: vehiclesFuture,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return Center(
-                                            child: CircularProgressIndicator());
-                                      } else if (snapshot.hasError) {
-                                        return Center(
-                                            child: Text(
-                                                "Error: ${snapshot.error}"));
-                                      } else if (snapshot.hasData) {
-                                        return buildDialogItem(
-                                            context,
-                                            snapshot
-                                                .data!); // Your method to build the list
-                                      } else {
-                                        return Center(
-                                            child: Text("No tickets found"));
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ));
-                            },
+                          Navigator.pushNamed(
+                            context,
+                            '/buyTicket',
+                            arguments: parkingLots[index * 2 + rowIndex],
                           );
                         },
                       ))
