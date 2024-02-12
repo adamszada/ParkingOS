@@ -1,8 +1,10 @@
 // ignore_for_file: unnecessary_string_interpolations
 
 import 'package:flutter/material.dart';
+import 'package:parkingos/parking/util/parking_live_view_item.dart';
 import 'package:parkingos/util/parking_cost.dart';
 import 'package:parkingos/util/parking_lot.dart';
+import 'package:parkingos/util/vehicle.dart';
 
 class ParkingLiveViewPage extends StatefulWidget {
   final ParkingLot parking;
@@ -16,9 +18,85 @@ class ParkingLiveViewPage extends StatefulWidget {
 class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
   final ParkingLot parking;
   ParkingLiveViewPageState({required this.parking});
+  String parkingSpot = "";
+  String floor = "";
+
+  List<ParkingLiveViewItem> temp = [
+    ParkingLiveViewItem(
+        floor: "1. piętro",
+        parkingSpot: "M:0",
+        vehicle: Vehicle(
+            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+        dateEnd: DateTime(2024, 2, 13, 16, 28),
+        earning: 0),
+    ParkingLiveViewItem(
+        floor: "1. piętro",
+        parkingSpot: "M:1",
+        vehicle: Vehicle(
+            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+        dateEnd: DateTime(2024, 2, 13, 16, 28),
+        earning: 0),
+    ParkingLiveViewItem(
+        floor: "1. piętro",
+        parkingSpot: "M:2",
+        vehicle: Vehicle(
+            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+        dateEnd: DateTime(2024, 2, 13, 16, 28),
+        earning: 0),
+    ParkingLiveViewItem(
+        floor: "1. piętro",
+        parkingSpot: "M:3",
+        vehicle: Vehicle(
+            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+        dateEnd: DateTime(2023, 2, 13, 16, 28),
+        earning: 100),
+    ParkingLiveViewItem(
+        floor: "2. piętro",
+        parkingSpot: "M:0",
+        vehicle: Vehicle(
+            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+        dateEnd: DateTime(2024, 2, 13, 16, 28),
+        earning: 100)
+  ];
+
+  List<ParkingLiveViewItem> parkingLiveViewItemList = [];
+
+  List<ParkingLiveViewItem> selectItem(List<ParkingLiveViewItem> list) {
+    List<ParkingLiveViewItem> newList = [];
+    for (int i = 0; i < list.length; i++) {
+      if ((list[i].floor == floor && list[i].parkingSpot == parkingSpot) ||
+          (list[i].floor == floor && parkingSpot == "wszystkie miejsca") ||
+          (floor == "wszystkie piętra" && list[i].parkingSpot == parkingSpot) ||
+          (floor == "wszystkie piętra" && parkingSpot == "wszystkie miejsca")) {
+        newList.add(list[i]);
+      }
+    }
+    return newList;
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<String> parkingSpotsList = [];
+    parkingSpotsList.add("wszystkie miejsca");
+    for (int i = 0; i < parking.capacityPerFloor; i++) {
+      parkingSpotsList.add("M:${i.toString()}");
+    }
+    if (parkingSpot == "") parkingSpot = parkingSpotsList.first;
+
+    List<String> floorsList = [];
+    floorsList.add("wszystkie piętra");
+    for (int i = 0; i < parking.floors; i++) {
+      if (i == 0) {
+        floorsList.add("parter");
+      } else {
+        floorsList.add("${i.toString()}. piętro");
+      }
+    }
+    if (floor == "") floor = floorsList.first;
     DateTime now = DateTime.now();
+
+    parkingLiveViewItemList = selectItem(temp);
+
     return SafeArea(
       child: Expanded(
         child: SizedBox(
@@ -36,6 +114,102 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Jaldi'),
+                )),
+                Expanded(
+                    child: Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25)),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: DropdownButton<String>(
+                              value: floor,
+                              borderRadius: BorderRadius.circular(25),
+                              underline: Container(),
+                              isExpanded: true,
+                              menuMaxHeight:
+                                  (MediaQuery.of(context).size.height ~/ 3)
+                                      .toDouble(),
+                              style: TextStyle(
+                                fontSize: MediaQuery.of(context).size.height <
+                                        MediaQuery.of(context).size.width
+                                    ? MediaQuery.of(context).size.height / 40
+                                    : MediaQuery.of(context).size.width / 40,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w100,
+                                fontFamily: 'Jaldi',
+                                decorationThickness: 3.0,
+                              ),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  floor = newValue!;
+                                });
+                              },
+                              items: floorsList.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25)),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: DropdownButton<String>(
+                              value: parkingSpot,
+                              borderRadius: BorderRadius.circular(25),
+                              underline: Container(),
+                              isExpanded: true,
+                              menuMaxHeight:
+                                  (MediaQuery.of(context).size.height ~/ 3)
+                                      .toDouble(),
+                              style: TextStyle(
+                                fontSize: MediaQuery.of(context).size.height <
+                                        MediaQuery.of(context).size.width
+                                    ? MediaQuery.of(context).size.height / 40
+                                    : MediaQuery.of(context).size.width / 40,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w100,
+                                fontFamily: 'Jaldi',
+                                decorationThickness: 3.0,
+                              ),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  parkingSpot = newValue!;
+                                });
+                              },
+                              items: parkingSpotsList
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ))
               ],
             ),
@@ -339,9 +513,9 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
             Expanded(
               child: ListView.builder(
                 itemBuilder: (context, index) {
-                  return buildParkingCostItem(index);
+                  return buildListViewItem(index);
                 },
-                itemCount: 100,
+                itemCount: parkingLiveViewItemList.length,
                 scrollDirection: Axis.vertical,
               ),
             ),
@@ -351,7 +525,7 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
     );
   }
 
-  Widget buildParkingCostItem(int index) {
+  Widget buildListViewItem(int index) {
     return Row(
       children: [
         Expanded(
@@ -364,19 +538,32 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
                 child: Row(children: [
+                  Text(
+                    "${parkingLiveViewItemList[index].floor} | ${parkingLiveViewItemList[index].parkingSpot}",
+                    style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.height / 40),
+                  ),
                   Expanded(
                     child: Text(
-                      "P: ${index} | M: ${index}",
+                      "${parkingLiveViewItemList[index].vehicle.model} | ${parkingLiveViewItemList[index].vehicle.brand} | ${parkingLiveViewItemList[index].vehicle.registration}",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height / 40),
                     ),
                   ),
                   Expanded(
                     child: Text(
-                      "${index % 2 == 1 ? "RENAULT | CLIO | ETM CU48" : "- - - - -"}",
+                      "do: ${parkingLiveViewItemList[index].dateEnd.toString().substring(0, 16)}       ",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height / 40),
                     ),
+                  ),
+                  Text(
+                    "        ${parkingLiveViewItemList[index].earning.toString()} zł",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.height / 40),
                   ),
                   // Expanded(
                   //   child: Row(

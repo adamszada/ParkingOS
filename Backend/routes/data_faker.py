@@ -230,7 +230,11 @@ def generate_parking():
 
     fake = Faker()
     name = fake.company()
-    address = fake.address()
+
+    street_name = fake.street_name()[:10]  # Maksymalnie 10 znaków na nazwę ulicy
+    street_type = fake.street_suffix()[:2]  # Skrót typu ulicy, maksymalnie 2 znaki
+    short_address = f"{street_type}. {street_name}"
+
     floors = random.randint(1, 5)
     spots_per_floor = random.randint(10, 50)
     day_tariff = round(random.uniform(5, 20), 2)
@@ -239,7 +243,7 @@ def generate_parking():
 
     parking_data = {
         "name": name,
-        "address": address,
+        "address": short_address,
         "floors": floors,
         "spots_per_floor": spots_per_floor,
         "dayTariff": day_tariff,
@@ -256,6 +260,11 @@ def add_parking(number, url="http://127.0.0.1:5000/add_parking"):
         response = requests.post(url, json=parking_data, headers=headers)
 
 
+def add_costs_to_every_parking_lot(url="http://127.0.0.1:5000/add_parking"):
+    users_response = requests.get('http://127.0.0.1:5000/get_parking_lots')
+    parkingLots = users_response.json().get('parkingLots', [])
+    for parkingLot in parkingLots:
+        parkingLot['id']
 
 
 if __name__ == '__main__':
@@ -263,6 +272,6 @@ if __name__ == '__main__':
     #top_up_random_amount_for_all_users()
     #add_random_car_to_every_user()
     #add_random_cars(3)
-    add_random_ticket()
+    #add_random_ticket()
     #parking_day_cycle(30)
-    #add_parking(5)
+    add_parking(5)
