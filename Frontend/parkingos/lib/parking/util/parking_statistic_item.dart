@@ -6,7 +6,7 @@ class ParkingStatisticsItem {
   late Vehicle vehicle;
   late DateTime dateStart;
   late DateTime dateEnd;
-  late String curEarnings = "";
+  late double curEarnings = 0;
   ParkingStatisticsItem(
       {required this.floor,
       required this.parkingSpot,

@@ -56,7 +56,7 @@ class ParkingStatisticsParkingSpotsPageState
             brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
         dateStart: DateTime(2024, 2, 12, 16, 28),
         dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: "35zł/h"),
+        curEarnings: 0),
     ParkingStatisticsItem(
         floor: "1. piętro",
         parkingSpot: "M:1",
@@ -64,7 +64,7 @@ class ParkingStatisticsParkingSpotsPageState
             brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
         dateStart: DateTime(2024, 2, 12, 16, 28),
         dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: "35zł/h"),
+        curEarnings: 0),
     ParkingStatisticsItem(
         floor: "1. piętro",
         parkingSpot: "M:2",
@@ -72,7 +72,7 @@ class ParkingStatisticsParkingSpotsPageState
             brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
         dateStart: DateTime(2024, 2, 12, 16, 28),
         dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: "35zł/h"),
+        curEarnings: 0),
     ParkingStatisticsItem(
         floor: "1. piętro",
         parkingSpot: "M:3",
@@ -80,7 +80,7 @@ class ParkingStatisticsParkingSpotsPageState
             brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
         dateStart: DateTime(2023, 2, 12, 16, 28),
         dateEnd: DateTime(2023, 2, 13, 16, 28),
-        curEarnings: "35zł/h"),
+        curEarnings: 0),
     ParkingStatisticsItem(
         floor: "2. piętro",
         parkingSpot: "M:0",
@@ -88,7 +88,7 @@ class ParkingStatisticsParkingSpotsPageState
             brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
         dateStart: DateTime(2024, 2, 12, 16, 28),
         dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: "35zł/h")
+        curEarnings: 0)
   ];
 
   String parkingSpot = "";
@@ -573,7 +573,7 @@ class ParkingStatisticsParkingSpotsPageState
                         ),
                       ),
                       Text(
-                        "${parkingStatisticsItems[index].curEarnings}",
+                        "${parkingStatisticsItems[index].curEarnings} zł",
                         textAlign: TextAlign.end,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 40),
