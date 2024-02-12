@@ -189,37 +189,6 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                         ],
                       ),
                     )),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF0C3C61),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: Text(
-                                "Szukaj",
-                                style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.height / 40,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    fontFamily: 'Jaldi'),
-                              ),
-                            )),
-                      ))
-                    ],
-                  ),
-                ),
                 Expanded(
                   child: FutureBuilder<List<ParkingLot>>(
                     future: _selectedIndex == 0
