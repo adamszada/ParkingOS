@@ -123,7 +123,7 @@ class ParkingStatisticsParkingSpotsPageState
   Widget build(BuildContext context) {
     List<String> parkingSpotsList = [];
     parkingSpotsList.add("wszystkie miejsca");
-    for (int i = 0; i < parking.capacity / parking.floors; i++) {
+    for (int i = 0; i < parking.capacityPerFloor; i++) {
       parkingSpotsList.add("M:${i.toString()}");
     }
     if (parkingSpot == "") parkingSpot = parkingSpotsList.first;
