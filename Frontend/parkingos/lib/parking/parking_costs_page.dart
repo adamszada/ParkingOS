@@ -19,7 +19,6 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
   final ParkingLot parking;
   ParkingCostsPageState({required this.parking});
   TextEditingController tittleController = TextEditingController();
-  TextEditingController typeController = TextEditingController();
   TextEditingController amountController = TextEditingController();
 
   List<ParkingCost> costList = [];
@@ -54,7 +53,7 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
 
     if (response.statusCode == 200) {
       fetchParkingCosts();
-    } 
+    }
   }
 
   @override
@@ -72,7 +71,7 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
         "parking_id": parking.id,
         "amount": double.parse(amountController.text),
         "title": tittleController.text,
-        "type": typeController.text,
+        "type": type,
       }),
     );
 
@@ -80,10 +79,9 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
       costList.add(ParkingCost(
         amount: double.parse(amountController.text),
         tittle: tittleController.text,
-        type: typeController.text,
+        type: type,
       ));
       tittleController.clear();
-      typeController.clear();
       amountController.clear();
       setState(() {});
     } else {
@@ -105,6 +103,9 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
       );
     }
   }
+
+  List<String> types = ["jednorazowy", "cykliczny"];
+  String type = "jednorazowy";
 
   @override
   Widget build(BuildContext context) {
@@ -252,16 +253,54 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 2),
-                                child: TextField(
-                                  controller: typeController,
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    contentPadding:
-                                        const EdgeInsets.only(left: 15),
-                                    border: OutlineInputBorder(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(25)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 25),
+                                    child: DropdownButton<String>(
+                                      value: type,
                                       borderRadius: BorderRadius.circular(25),
-                                      // borderSide: BorderSide.none,
+                                      underline: Container(),
+                                      isExpanded: true,
+                                      menuMaxHeight:
+                                          (MediaQuery.of(context).size.height ~/
+                                                  3)
+                                              .toDouble(),
+                                      style: TextStyle(
+                                        fontSize:
+                                            MediaQuery.of(context).size.height <
+                                                    MediaQuery.of(context)
+                                                        .size
+                                                        .width
+                                                ? MediaQuery.of(context)
+                                                        .size
+                                                        .height /
+                                                    40
+                                                : MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    40,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w100,
+                                        fontFamily: 'Jaldi',
+                                        decorationThickness: 3.0,
+                                      ),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          type = newValue!;
+                                        });
+                                      },
+                                      items: types
+                                          .map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
                                 ),
@@ -299,13 +338,7 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
                               onPressed: () {
                                 if (tittleController.text.isNotEmpty &&
                                     amountController.text.isNotEmpty &&
-                                    typeController.text.isNotEmpty) {
-                                  costList.add(ParkingCost(
-                                      amount: double.parse(
-                                          double.parse(amountController.text)
-                                              .toStringAsFixed(2)),
-                                      tittle: tittleController.text,
-                                      type: typeController.text));
+                                    type.isNotEmpty) {
                                   addParkingCost();
                                   setState(() {});
                                 }
