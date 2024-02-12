@@ -170,7 +170,8 @@ def add_ticket():
                 # 'exit_date': exit_date,
                 'QR': None,
                 'floor': floor,
-                'parkingSpotNumber': parkingSpotNumber
+                'parkingSpotNumber': parkingSpotNumber,
+                'moneyDue': 0
             })
 
             ticket_id = ticket_ref.id
