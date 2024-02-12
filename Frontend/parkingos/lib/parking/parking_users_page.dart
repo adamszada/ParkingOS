@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'package:parkingos/util/parking_user.dart';
+import 'package:parkingos/util/vehicle.dart';
 
 class ParkingUsersPage extends StatefulWidget {
   final ParkingLot parking;
@@ -11,21 +12,55 @@ class ParkingUsersPage extends StatefulWidget {
       ParkingUsersPageState(parking: this.parking);
 }
 
-List<ParkingUser> userList = [
-  ParkingUser(login: "Anna", balance: 50.0),
+List<ParkingUser> temp = [
+  ParkingUser(login: "Anna", balance: 50.0, isBlocked: true),
   ParkingUser(login: "Tomasz", balance: 75.0),
   ParkingUser(login: "Katarzyna", balance: 60.0),
   ParkingUser(login: "Marcin", balance: 45.0),
   ParkingUser(login: "Ewa", balance: 80.0),
 ];
-final tab = [1, 0, 0, 0, 0];
+
+List<Vehicle> tempVehicle = [
+  Vehicle(brand: "a", model: "a", registration: "a"),
+  Vehicle(brand: "b", model: "b", registration: "b"),
+  Vehicle(brand: "c", model: "c", registration: "c"),
+];
+int moreInfoIndex = -1;
 
 class ParkingUsersPageState extends State<ParkingUsersPage> {
   final ParkingLot parking;
+
   ParkingUsersPageState({required this.parking});
+  void _updateSearchTerm() {
+    setState(() {
+      _searchTerm = searchbarController.text;
+    });
+    // Tutaj można dodać logikę wyszukiwania, np. zaktualizować listę wyników.
+  }
+
+  TextEditingController searchbarController = TextEditingController();
+  String _searchTerm = "";
+  String info = '';
+
+  List<ParkingUser> selectItems(List<ParkingUser> list) {
+    List<ParkingUser> new_list = [];
+    if (_searchTerm == "") return list;
+
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].login.toUpperCase().contains(_searchTerm.toUpperCase())) {
+        new_list.add(list[i]);
+      }
+    }
+
+    return new_list;
+  }
+
+  List<ParkingUser> userList = [];
+
   @override
   Widget build(BuildContext context) {
-    TextEditingController searchbarController = TextEditingController();
+    userList = selectItems(temp);
+    info = userList.isEmpty ? "Nie znaleziono pasującego użytkownika" : "";
 
     return SafeArea(
       child: Expanded(
@@ -55,21 +90,26 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                       child: TextField(
                         controller: searchbarController,
                         decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: 'Wyszukaj...',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25),
-                              borderSide: BorderSide.none,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                searchbarController.clear();
-                                setState(() {});
-                              },
-                            )),
+                          hintText: "nazwa użytkownika",
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.8),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide.none,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: _searchTerm != ""
+                                ? const Icon(Icons.clear)
+                                : const Icon(Icons.search),
+                            onPressed: () {
+                              searchbarController.clear();
+                              _updateSearchTerm();
+                            },
+                          ),
+                        ),
+                        onChanged: (value) {
+                          _updateSearchTerm();
+                        },
                       ),
                     ),
                   ],
@@ -77,12 +117,106 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20),
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        return buildParkingLotItem(index);
-                      },
-                      itemCount: userList.length,
-                      scrollDirection: Axis.vertical,
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Text(
+                            info,
+                            textAlign: TextAlign.end,
+                            style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.height <
+                                      MediaQuery.of(context).size.width
+                                  ? MediaQuery.of(context).size.height / 20
+                                  : MediaQuery.of(context).size.width / 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Jaldi',
+                              decorationThickness: 3.0,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              info.isNotEmpty
+                                  ? Container()
+                                  : Row(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 25.0),
+                                            child: Text(
+                                              "użytkownik:",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontFamily: "Jaldi",
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .height /
+                                                          48),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 25.0),
+                                            child: Text(
+                                              "saldo:",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontFamily: "Jaldi",
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .height /
+                                                          48),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 25.0),
+                                            child: Text(
+                                              "",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontFamily: "Jaldi",
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .height /
+                                                          48),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              24,
+                                        )
+                                      ],
+                                    ),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemBuilder: (context, index) {
+                                    return buildParkingUserItem(index);
+                                  },
+                                  itemCount: userList.length,
+                                  scrollDirection: Axis.vertical,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -94,7 +228,20 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
     );
   }
 
-  Widget buildParkingLotItem(int index) {
+  Widget buildUserCarItem(int index) {
+    return Row(
+      children: [
+        Text(
+          "${tempVehicle[index].brand} | ${tempVehicle[index].model} | ${tempVehicle[index].registration}",
+          style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: MediaQuery.of(context).size.height / 40),
+        ),
+      ],
+    );
+  }
+
+  Widget buildParkingUserItem(int index) {
     return Row(
       children: [
         Expanded(
@@ -102,7 +249,10 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Container(
               decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(25)),
+                  color: userList[index].isBlocked == true
+                      ? Colors.blueGrey
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(25)),
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
@@ -129,16 +279,26 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                       ),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            userList[index].isBlocked =
+                                userList[index].isBlocked == true
+                                    ? false
+                                    : true;
+                            setState(() {});
+                          },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(130, 255, 0, 0),
+                            backgroundColor: userList[index].isBlocked == true
+                                ? Colors.green
+                                : const Color.fromARGB(130, 255, 0, 0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
                           ),
-                          child: const Text(
-                            "zablokuj",
-                            style: TextStyle(
+                          child: Text(
+                            userList[index].isBlocked == true
+                                ? "odblokuj"
+                                : "zablokuj",
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -146,11 +306,16 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                       ),
                       IconButton(
                         onPressed: () {
-                          tab[index] == 1 ? tab[index] = 0 : tab[index] = 1;
+                          if (index != moreInfoIndex) {
+                            moreInfoIndex = index;
+                          } else {
+                            moreInfoIndex = -1;
+                          }
+
                           setState(() {});
                         },
                         icon: Icon(
-                          tab[index] == 0
+                          moreInfoIndex == index
                               ? Icons.arrow_drop_down_circle
                               : Icons.keyboard_arrow_up_outlined,
                           size: MediaQuery.of(context).size.height / 32,
@@ -160,7 +325,7 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                         padding: EdgeInsets.zero,
                       )
                     ]),
-                    tab[index] == 1
+                    moreInfoIndex == index
                         ? Row(
                             children: [
                               Expanded(
@@ -178,24 +343,16 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                                       )),
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "RENAULT | CLIO | ETM CU48",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .height /
-                                                40),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.search),
-                                        color: Colors.blue,
-                                      )
-                                    ],
-                                  )
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: tempVehicle
+                                        .length, // Ilość elementów w wewnętrznej liście
+                                    itemBuilder: (context, subIndex) {
+                                      return buildUserCarItem(subIndex);
+                                    },
+                                  ),
                                 ],
                               ))
                             ],
