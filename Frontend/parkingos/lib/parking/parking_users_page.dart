@@ -103,11 +103,13 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                                 : const Icon(Icons.search),
                             onPressed: () {
                               searchbarController.clear();
+                              moreInfoIndex = -1;
                               _updateSearchTerm();
                             },
                           ),
                         ),
                         onChanged: (value) {
+                          moreInfoIndex = -1;
                           _updateSearchTerm();
                         },
                       ),
