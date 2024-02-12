@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../globals.dart' as globals;
 
 class ChangeEmail extends StatefulWidget {
   const ChangeEmail({super.key});
@@ -8,6 +12,36 @@ class ChangeEmail extends StatefulWidget {
 }
 
 class _ChangeEmailState extends State<ChangeEmail> {
+ TextEditingController newpasswordController = TextEditingController();
+  TextEditingController newpassword2Controller = TextEditingController();
+  String errorMessage = '';
+
+  Future<bool> changePassword() async {
+    String old_email = globals.currentUser;
+    String new_email = newpasswordController.text;
+    bool check = false;
+    final response = await http.post(
+      Uri.parse("http://127.0.0.1:5000/change_email"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"old_email": old_email, "new_email": new_email}),
+    );
+
+            final Map<String, dynamic> data = jsonDecode(response.body);
+        errorMessage = data['message'];
+    setState(() {
+      if (response.statusCode == 200) {
+
+        print(errorMessage);
+        globals.currentUser = new_email;
+        check = true;
+        //errorMessage = 'Hasło zmienione poprawnie.';
+      } else {
+        errorMessage = data['message'];
+      }
+    });
+    return check;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +108,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                                   ),
                                 ),
                                 TextField(
-                                  obscureText: true,
+                                  controller: newpasswordController,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
@@ -102,7 +136,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                                   ),
                                 ),
                                 TextField(
-                                  obscureText: true,
+                                  controller: newpassword2Controller,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
@@ -118,9 +152,25 @@ class _ChangeEmailState extends State<ChangeEmail> {
                                     height:
                                         MediaQuery.of(context).size.height / 20,
                                     child: ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pushNamed(
-                                            context, '/myaccount');
+                                      onPressed: () async {
+                                        if (newpasswordController.text != '' &&
+                                            newpassword2Controller.text != '') {
+                                          if (newpasswordController.text ==
+                                              newpassword2Controller.text) {
+                                            if (await changePassword() == true)
+                                              Navigator.pushNamed(context, '/home');
+                                          } else {
+                                            setState(() {
+                                              errorMessage =
+                                                  "Maile nie są jednakowe!!!";
+                                            });
+                                          }
+                                        } else {
+                                          setState(() {
+                                            errorMessage = "Podaj oba maile!!!";
+                                          });
+                                        }
+                                         
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -131,7 +181,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                                         ),
                                       ),
                                       child: Text(
-                                        'zmień',
+                                        'Zmień e-mail',
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontFamily: "Jaldi",
@@ -142,7 +192,24 @@ class _ChangeEmailState extends State<ChangeEmail> {
                                                 45),
                                       ),
                                     )),
-                                const SizedBox(height: 16),
+                                if (errorMessage.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        errorMessage,
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontFamily: "Jaldi",
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              45,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                               ]))),
                 )
               ],
