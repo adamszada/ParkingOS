@@ -150,7 +150,8 @@ def add_ticket():
         data = request.json  # Get ticket data from the request
 
         # Extract ticket data from JSON
-        vehicle_id = data.get('vehicle_id')
+        userID = data.get('userID')
+        registration = data.get('registration')
         parking_id = data.get('parking_id')
         entry_date = data.get('entry_date')
         # qr_code = data.get('qr_code')
@@ -160,7 +161,8 @@ def add_ticket():
             # Create a new ticket document in the 'Tickets' collection
             ticket_ref = db.collection('Tickets').document()
             ticket_ref.set({
-                'vehicle_id': vehicle_id,
+                'userID': userID,
+                'registration': registration,
                 'parking_id': parking_id,
                 'entry_date': entry_date,
                 # 'exit_date': exit_date,
@@ -168,7 +170,15 @@ def add_ticket():
                 'place_id': place_id
             })
 
-            return jsonify({"message": "Ticket added successfully."}), 200
+            ticket_id = ticket_ref.id
+            # Pobierz nowo utworzony bilet z bazy danych
+            new_ticket = ticket_ref.get().to_dict()
+
+            return jsonify({
+                "message": "Ticket added successfully.",
+                "ticket_id": ticket_id,
+                "ticket": new_ticket
+            }), 200
 
         except Exception as e:
             return jsonify({"message": f"Error adding ticket: {str(e)}"}), 500

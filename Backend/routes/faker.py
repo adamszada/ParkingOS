@@ -1,5 +1,9 @@
+
+import json
 import random
 import string
+from datetime import datetime, timedelta
+
 import requests
 
 
@@ -143,9 +147,87 @@ def add_random_car_to_every_user():
         print(result)
 
 
+
+def add_random_ticket():
+
+
+    # Generowanie obecnego daty i czasu jako string
+
+    users_response = requests.get('http://127.0.0.1:5000/users')
+    users_data = users_response.json().get('users', [])
+    currentDate = datetime.now()
+
+    for user in users_data:
+        cars = requests.get('http://127.0.0.1:5000/get_cars_by_owner/' + user['uid']).json()['cars']
+        car = random.choice(cars)
+
+        delta = random.randint(-5, 8)
+        enterDate = currentDate + timedelta(hours=delta)
+        # Ticket data
+        ticket_data = {
+            "userID": user['uid'],
+            "registration": car['registration'],
+            "parking_id": "parking123",
+            "entry_date": str(enterDate),
+            "place_id": "place456"
+        }
+        # Convert data to JSON format
+        ticket_json = json.dumps(ticket_data)
+
+        # Ustawienie nagłówka Content-Type na application/json
+        headers = {'Content-Type': 'application/json'}
+
+        # Send POST request to the endpoint with JSON data and headers
+        response = requests.post('http://127.0.0.1:5000/add_ticket', data=ticket_json, headers=headers)
+
+        exit_date = {
+            "exit_date": str(enterDate + timedelta(hours=random.randint(1, 8)))
+        }
+        ej = json.dumps(exit_date)
+        result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
+
+
+def parking_day_cycle(days):
+    users_response = requests.get('http://127.0.0.1:5000/users')
+    users_data = users_response.json().get('users', [])
+    currentDate = datetime.now()
+    for _ in range(days):
+
+        #for user in users_data:
+            user = users_data[0]
+            cars = requests.get('http://127.0.0.1:5000/get_cars_by_owner/' + user['uid']).json()['cars']
+            car = random.choice(cars)
+
+            delta = random.randint(-5, 8)
+            enterDate = currentDate + timedelta(hours=delta)
+            # Ticket data
+            ticket_data = {
+                "userID": user['uid'],
+                "registration": car['registration'],
+                "parking_id": "parking123",
+                "entry_date": str(enterDate),
+                "place_id": "place456"
+            }
+            # Convert data to JSON format
+            ticket_json = json.dumps(ticket_data)
+
+            # Ustawienie nagłówka Content-Type na application/json
+            headers = {'Content-Type': 'application/json'}
+
+            # Send POST request to the endpoint with JSON data and headers
+            response = requests.post('http://127.0.0.1:5000/add_ticket', data=ticket_json, headers=headers)
+
+            exit_date = {
+                "exit_date": str(enterDate + timedelta(hours=random.randint(1, 8)))
+            }
+            ej = json.dumps(exit_date)
+            result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
+            currentDate += timedelta(days=1)
+
 if __name__ == '__main__':
     #fill_database_with_random_users(10)
     #top_up_random_amount_for_all_users()
     #add_random_car_to_every_user()
-    add_random_cars(3)
-
+    #add_random_cars(3)
+    #add_random_ticket()
+    parking_day_cycle(30)

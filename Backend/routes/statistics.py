@@ -31,7 +31,7 @@ def count_transactions_by_month():
     if request.method == "GET":
         try:
             # Get parking_id from query parameters
-            parking_id = request.args.get('parking_id')
+            parking_id = request.json.get('parking_id')
 
             # Query the database for tickets with the specified parking_id
             tickets_ref = db.collection('Tickets').where('parking_id', '==', parking_id).get()
@@ -43,7 +43,7 @@ def count_transactions_by_month():
             for ticket in tickets_ref:
                 entry_date = ticket.get('entry_date')
                 if entry_date:
-                    entry_month = datetime.strptime(entry_date, "%Y-%m-%d").strftime("%Y-%m")
+                    entry_month = datetime.strptime(entry_date, "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m")
                     transactions_by_month[entry_month] += 1
 
             return jsonify(transactions_by_month), 200
