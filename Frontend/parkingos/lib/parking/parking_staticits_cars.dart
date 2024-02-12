@@ -233,7 +233,7 @@ class ParkingStatisticsCarsPageState extends State<ParkingStatisticsCarsPage> {
                       ),
                       Expanded(
                         child: Text(
-                          "od: ${parkingStatisticsItems[index].dateStart} do: ${parkingStatisticsItems[index].dateEnd}",
+                          "od: ${parkingStatisticsItems[index].dateStart.toString().substring(0, 16)} do: ${parkingStatisticsItems[index].dateEnd.toString().substring(0, 16)}",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize:
