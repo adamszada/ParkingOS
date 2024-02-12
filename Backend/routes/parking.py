@@ -1,4 +1,5 @@
 import random
+from datetime import datetime, timedelta
 
 from flask import jsonify, request
 from geopy.distance import geodesic
@@ -271,3 +272,42 @@ def user_tickets_data(userID):
         tickets_data.append(ticket_d)
 
     return jsonify({"tickets": tickets_data}), 200
+
+
+def get_tariffs(parking_id, entry_time, day_tariff_start_hour, night_tariff_start_hour):
+    try:
+        # Pobierz dane o parkingu
+        parking_ref = db.collection('ParkingLots').document(parking_id)
+        parking_data = parking_ref.get().to_dict()
+
+        # Pobierz taryfy
+        day_tariff = parking_data.get('dayTariff')
+        night_tariff = parking_data.get('nightTariff')
+
+        # Obecny czas
+        current_time = datetime.now()
+
+        current_time = datetime.now()
+        night_h = 0
+        day_h = 0
+        while entry_time < current_time:
+            if night_tariff_start_hour <= entry_time.hour < 24 or entry_time.hour >= 0 and entry_time.hour < day_tariff_start_hour:
+                night_h += 1
+            else:
+                day_h += 1
+
+            entry_time += timedelta(hours=1)
+
+        return jsonify({
+            "day_tariff": day_tariff,
+            "night_tariff": night_tariff,
+            "hours_in_day_tariff": day_h,
+            "hours_in_night_tariff": night_h
+        }), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error getting tariffs: {str(e)}"}), 500
+
+
+
+
