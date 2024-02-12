@@ -11,6 +11,7 @@ class ParkingLot {
   late double nightTariff;
   late String operatingHours;
   late int floors = 3;
+  late int capacityPerFloor = 3;
 
   ParkingLot(
       {this.id = '',
@@ -22,6 +23,7 @@ class ParkingLot {
       this.totalEarnings = 0.0,
       this.earningsToday = 0.0,
       this.curEarnings = 0.0,
+      this.capacityPerFloor = 3,
       required this.dayTariff,
       required this.nightTariff,
       required this.operatingHours});
