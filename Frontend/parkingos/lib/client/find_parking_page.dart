@@ -14,7 +14,8 @@ class FindParkingPage extends StatefulWidget {
 }
 
 Future<List<Vehicle>> getVehicles() async {
-  var url = Uri.parse("http://127.0.0.1:5000/get_cars_by_owner/" + globals.userID);
+  var url =
+      Uri.parse("http://127.0.0.1:5000/get_cars_by_owner/" + globals.userID);
   final response =
       await http.get(url, headers: {"Content-Type": "application/json"});
   if (response.statusCode == 200) {
@@ -71,19 +72,39 @@ Future<List<ParkingLot>> getClosestParkings() async {
     throw Exception('Failed to load vehicles');
   }
 }
+
 Future<List<Vehicle>> vehiclesFuture = getVehicles();
-const List<String> list = <String>['One', 'Two', 'Three', 'Four'];
 
 class _ParkingLotsPageState extends State<FindParkingPage> {
   int _selectedIndex = 0;
+  String _searchTerm = '';
+  TextEditingController parkingStringController = TextEditingController();
 
   Future<List<ParkingLot>> parkinglotsCheapest = getCheapestParkings();
   Future<List<ParkingLot>> parkinglotsClosest = getClosestParkings();
 
+  List<ParkingLot> findParkingByString(
+      String searchString, List<ParkingLot> list) {
+    List<ParkingLot> newList = [];
 
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].address.contains(searchString) ||
+          list[i].name.contains(searchString)) {
+        newList.add(list[i]);
+      }
+    }
+    return newList;
+  }
 
   @override
   Widget build(BuildContext context) {
+    void _updateSearchTerm() {
+      setState(() {
+        _searchTerm = parkingStringController.text;
+      });
+      // Tutaj można dodać logikę wyszukiwania, np. zaktualizować listę wyników.
+    }
+
     return Scaffold(
         body: Padding(
             padding: EdgeInsets.symmetric(
@@ -134,7 +155,17 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                                     ),
                                   ),
                                   child: TextField(
+                                    controller: parkingStringController,
                                     decoration: InputDecoration(
+                                      suffixIcon: IconButton(
+                                        icon: _searchTerm != ""
+                                            ? const Icon(Icons.clear)
+                                            : const Icon(Icons.search),
+                                        onPressed: () {
+                                          parkingStringController.clear();
+                                          _updateSearchTerm();
+                                        },
+                                      ),
                                       hintText: 'Adres',
                                       filled: true,
                                       fillColor: Colors
@@ -147,6 +178,9 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                                           const EdgeInsets.symmetric(
                                               vertical: 10.0, horizontal: 10.0),
                                     ),
+                                    onChanged: (value) {
+                                      _updateSearchTerm();
+                                    },
                                   ),
                                 ),
                               ],
@@ -197,7 +231,8 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
                       } else if (snapshot.hasError) {
                         return Center(child: Text("Error: ${snapshot.error}"));
                       } else if (snapshot.hasData) {
-                        return buildParkingLotList(snapshot.data!);
+                        return buildParkingLotList(findParkingByString(
+                            parkingStringController.text, snapshot.data!));
                       } else {
                         return Center(child: Text("No parkings found"));
                       }
@@ -453,88 +488,91 @@ class _ParkingLotsPageState extends State<FindParkingPage> {
     ));
   }
 
-Widget buildDialogItem(BuildContext context, List<Vehicle> vehicles) {
-  // Using StatefulBuilder to manage local state within the dialog
-  return StatefulBuilder(
-    builder: (BuildContext context, StateSetter setState) {
-      // Initial values for state variables
-      String dropdownValue = vehicles.first.registration;
-      DateTime selectedDate = DateTime.now();
-      TimeOfDay selectedTime = TimeOfDay.now();
+  Widget buildDialogItem(BuildContext context, List<Vehicle> vehicles) {
+    // Using StatefulBuilder to manage local state within the dialog
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        // Initial values for state variables
+        String dropdownValue = vehicles.first.registration;
+        DateTime selectedDate = DateTime.now();
+        TimeOfDay selectedTime = TimeOfDay.now();
 
-      return Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-        elevation: 16,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 400),
-          child: Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-                color: const Color(0xffD9D9D9), borderRadius: BorderRadius.circular(25)),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                DropdownButton<String>(
-                  value: dropdownValue,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Color(0xff0C3C61)),
-                  underline: Container(
-                    height: 2,
-                    color: Color(0xff0C3C61),
-                  ),
-                  onChanged: (String? value) {
-                    // Update dropdownValue when a new item is selected
-                    setState(() => dropdownValue = value!);
-                  },
-                  items: vehicles.map<DropdownMenuItem<String>>((Vehicle vehicle) {
-                    return DropdownMenuItem<String>(
-                      value: vehicle.registration,
-                      child: Text(vehicle.registration),
-                    );
-                  }).toList(),
-                ),
-                TextFormField(
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    hintText: "Do kiedy zostajesz?",
-                    icon: Icon(Icons.calendar_today),
-                  ),
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2025),
-                    );
-                    if (pickedDate != null) {
-                      TimeOfDay? pickedTime = await showTimePicker(
-                        context: context,
-                        initialTime: selectedTime,
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+          elevation: 16,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 400),
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: const Color(0xffD9D9D9),
+                  borderRadius: BorderRadius.circular(25)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  DropdownButton<String>(
+                    value: dropdownValue,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Color(0xff0C3C61)),
+                    underline: Container(
+                      height: 2,
+                      color: Color(0xff0C3C61),
+                    ),
+                    onChanged: (String? value) {
+                      // Update dropdownValue when a new item is selected
+                      setState(() => dropdownValue = value!);
+                    },
+                    items: vehicles
+                        .map<DropdownMenuItem<String>>((Vehicle vehicle) {
+                      return DropdownMenuItem<String>(
+                        value: vehicle.registration,
+                        child: Text(vehicle.registration),
                       );
-                      if (pickedTime != null) {
-                        // Update selectedDate and selectedTime when new values are picked
-                        setState(() {
-                          selectedDate = pickedDate;
-                          selectedTime = pickedTime;
-                        });
+                    }).toList(),
+                  ),
+                  TextFormField(
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      hintText: "Do kiedy zostajesz?",
+                      icon: Icon(Icons.calendar_today),
+                    ),
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2025),
+                      );
+                      if (pickedDate != null) {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: selectedTime,
+                        );
+                        if (pickedTime != null) {
+                          // Update selectedDate and selectedTime when new values are picked
+                          setState(() {
+                            selectedDate = pickedDate;
+                            selectedTime = pickedTime;
+                          });
+                        }
                       }
-                    }
-                  },
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close dialog
-                  },
-                ),
-              ],
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close dialog
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }
