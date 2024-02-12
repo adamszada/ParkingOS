@@ -155,9 +155,12 @@ def add_ticket():
         parking_id = data.get('parking_id')
         entry_date = data.get('entry_date')
         # qr_code = data.get('qr_code')
-        # Todo generate floor and number based on already taken spots
-        parkingSpotNumber = data.get('parkingSpotNumber')
-        floor = 1
+        # Todo generate QR!!!!!!!!
+
+        floor, parkingSpotNumber = generate_parkingSpot(parking_id)
+        if floor == -1 and parkingSpotNumber == -1:
+            error_msg = "All spots are already taken"
+            return jsonify({"message": f"Error adding ticket: {str(error_msg)}"}), 500
         try:
             # Create a new ticket document in the 'Tickets' collection
             ticket_ref = db.collection('Tickets').document()
@@ -167,7 +170,7 @@ def add_ticket():
                 'parking_id': parking_id,
                 'entry_date': entry_date,
                 'realized': False,
-                # 'exit_date': exit_date,
+                'exit_date': None,
                 'QR': None,
                 'floor': floor,
                 'parkingSpotNumber': parkingSpotNumber,
@@ -188,6 +191,31 @@ def add_ticket():
             return jsonify({"message": f"Error adding ticket: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
+
+
+def generate_parkingSpot(parkingID):
+    parking_ref = db.collection('ParkingLots').document(parkingID)
+    parking_doc = parking_ref.get().to_dict()
+
+    floors = parking_doc['floors']
+    parking_spaces_per_floor = parking_doc['spots_per_floor']
+    parking_spaces = {floor: [False] * parking_spaces_per_floor for floor in range(1, floors + 1)}
+
+    tickets_query = db.collection('Tickets').where("parking_id", "==", parkingID).where("realized", "==", False).stream()
+    for ticket_doc in tickets_query:
+        ticket_data = ticket_doc.to_dict()
+        ticket_floor = ticket_data['floor']
+        ticket_spot = ticket_data['parkingSpotNumber']
+        parking_spaces[ticket_floor][ticket_spot-1] = True
+
+    for floor in parking_spaces.keys():
+        for spot in range(len(parking_spaces[floor])):
+            if not parking_spaces[floor][spot]:
+                return floor, spot+1
+
+    return -1, -1
+
+
 
 
 @app.route("/tickets", methods=["GET"])
