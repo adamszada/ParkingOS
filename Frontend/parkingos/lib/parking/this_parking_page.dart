@@ -165,7 +165,7 @@ class ThisParkingPageState extends State<ThisParkingPage> {
                           fontFamily: 'Jaldi'),
                     ),
                     Text(
-                      "[TO DO]",
+                      "${parking.floors}",
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height <
                                   MediaQuery.of(context).size.width
@@ -192,7 +192,7 @@ class ThisParkingPageState extends State<ThisParkingPage> {
                           fontFamily: 'Jaldi'),
                     ),
                     Text(
-                      "[TO DO]",
+                      "${parking.capacityPerFloor}",
                       style: TextStyle(
                           fontSize: MediaQuery.of(context).size.height <
                                   MediaQuery.of(context).size.width
