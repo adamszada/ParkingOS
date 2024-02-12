@@ -151,26 +151,26 @@ def add_random_car_to_every_user():
 
 def add_random_ticket():
 
-
     # Generowanie obecnego daty i czasu jako string
 
     users_response = requests.get('http://127.0.0.1:5000/users')
     users_data = users_response.json().get('users', [])
     currentDate = datetime.now()
 
+    parkingLots = requests.get('http://127.0.0.1:5000/get_parking_lots').json()['parkingLots']
     for user in users_data:
         cars = requests.get('http://127.0.0.1:5000/get_cars_by_owner/' + user['uid']).json()['cars']
         car = random.choice(cars)
-
+        parking = random.choice(parkingLots)
         delta = random.randint(-5, 8)
         enterDate = currentDate + timedelta(hours=delta)
+
         # Ticket data
         ticket_data = {
             "userID": user['uid'],
             "registration": car['registration'],
-            "parking_id": "2UzF6R7ba7qs8afnJJhP",
-            "entry_date": str(enterDate),
-            "parkingSpotNumber": "place456"
+            "parking_id": parking['id'],
+            "entry_date": str(enterDate)
         }
         # Convert data to JSON format
         ticket_json = json.dumps(ticket_data)
@@ -180,12 +180,14 @@ def add_random_ticket():
 
         # Send POST request to the endpoint with JSON data and headers
         response = requests.post('http://127.0.0.1:5000/add_ticket', data=ticket_json, headers=headers)
+        if response.json()['message'] =="Ticket added successfully.":
 
-        exit_date = {
-            "exit_date": str(enterDate + timedelta(hours=random.randint(1, 8)))
-        }
-        ej = json.dumps(exit_date)
-        result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
+            exit_date = {
+                "exit_date": str(enterDate + timedelta(hours=random.randint(1, 8)))
+            }
+            ej = json.dumps(exit_date)
+
+            result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
         break
 
 def parking_day_cycle(days):
@@ -272,6 +274,7 @@ if __name__ == '__main__':
     #top_up_random_amount_for_all_users()
     #add_random_car_to_every_user()
     #add_random_cars(3)
-    #add_random_ticket()
+
+    add_random_ticket()
     #parking_day_cycle(30)
-    add_parking(5)
+    #add_parking(5)

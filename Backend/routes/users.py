@@ -189,6 +189,5 @@ def manage_balance():
 
     return jsonify({"message": "Invalid request method."}), 405
 
-    return jsonify({"message": "Invalid request method."}), 405
 
 
