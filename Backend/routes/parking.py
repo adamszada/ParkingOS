@@ -66,6 +66,53 @@ def add_parking():
 
     return jsonify({"message": "Invalid request method."}), 405
 
+@app.route("/update_parking/<parking_id>", methods=["POST"])
+def modify_parking(parking_id):
+    if request.method == "POST":
+        data = request.json
+        if not all(key in data for key in
+                   ['name', 'address', 'floors', 'spots_per_floor', 'dayTariff', 'nightTariff', 'operatingHours']):
+            return jsonify({"message": "Missing required fields."}), 400
+
+        name = data.get("name")
+        address = data.get("address")
+        floors = int(data.get("floors"))
+        spots_per_floor = int(data.get("spots_per_floor"))
+        dayTariff = data.get("dayTariff")
+        nightTariff = data.get("nightTariff")
+        operatingHours = data.get("operatingHours")
+
+        if floors <= 0 or spots_per_floor <= 0 or dayTariff <= 0 or nightTariff <= 0:
+            return jsonify({"message": "Invalid field values. Values must be greater than zero."}), 400
+
+        try:
+            capacity = floors * spots_per_floor
+            parking_ref = db.collection("ParkingLots").document(parking_id)
+
+            current_values = parking_ref.get().to_dict()
+            current_lon = current_values.get("lon")
+            current_lat = current_values.get("lat")
+
+            parking_ref.update({
+                "name": name,
+                "address": address,
+                "capacity": capacity,
+                "dayTariff": dayTariff,
+                "nightTariff": nightTariff,
+                "operatingHours": operatingHours,
+                "floors": floors,
+                "capacityPerFloor": spots_per_floor,
+                "lon": current_lon,
+                "lat": current_lat
+            })
+
+            return jsonify({"message": f"Parking with ID {parking_id} modified successfully."}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error modifying parking: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
 
 @app.route("/delete_parking/<parking_id>", methods=["DELETE"])
 def delete_parking_lot(parking_id):
