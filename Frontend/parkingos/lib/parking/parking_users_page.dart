@@ -413,6 +413,7 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                                             ConnectionState.waiting) {
                                           return CircularProgressIndicator();
                                         } else if (snapshot.hasError) {
+                                          return Container();
                                         } else {
                                           return ListView.builder(
                                             shrinkWrap: true,
