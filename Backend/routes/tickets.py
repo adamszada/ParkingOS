@@ -206,7 +206,7 @@ def user_tickets_data(userID):
 
 @app.route("/get_ticket_moneyDue/<ticket_id>", methods=["GET"])
 def get_ticket_moneyDue(ticket_id):
-    if request.method == "PATCH":
+    if request.method == "GET":
         try:
             ticket_ref = db.collection('Tickets').document(ticket_id)
             ticket_data = ticket_ref.get().to_dict()
@@ -216,8 +216,8 @@ def get_ticket_moneyDue(ticket_id):
             if ticket_data['realized']:
                 return jsonify({"message": f"Ticket has already been realized!"}), 407
 
-
-            return jsonify({"message": "Exit date updated successfully."}), 200
+            return jsonify({"message": "Sucess",
+                            "moneyDue": ticket_data["moneyDue"]}), 200
 
         except Exception as e:
             return jsonify({"message": f"Error updating exit date: {str(e)}"}), 500
