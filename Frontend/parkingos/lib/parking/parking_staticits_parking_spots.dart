@@ -439,7 +439,7 @@ class ParkingStatisticsParkingSpotsPageState
                                   height: 1),
                             ),
                             Text(
-                              "${parking.totalEarnings} zł",
+                              "${parking.totalEarnings.toStringAsFixed(2)} zł",
                               style: TextStyle(
                                   fontSize: MediaQuery.of(context).size.height <
                                           MediaQuery.of(context).size.width
@@ -479,7 +479,7 @@ class ParkingStatisticsParkingSpotsPageState
                                   height: 1),
                             ),
                             Text(
-                              "${parking.curEarnings} zł/h",
+                              "${parking.curEarnings.toStringAsFixed(2)} zł/h",
                               style: TextStyle(
                                   fontSize: MediaQuery.of(context).size.height <
                                           MediaQuery.of(context).size.width

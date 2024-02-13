@@ -1,10 +1,13 @@
 // ignore_for_file: unnecessary_string_interpolations
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parkingos/parking/util/parking_statistic_item.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'package:parkingos/util/vehicle.dart';
+import 'package:http/http.dart' as http;
 
 class ParkingStatisticsCarsPage extends StatefulWidget {
   final ParkingLot parking;
@@ -23,48 +26,30 @@ class ParkingStatisticsCarsPageState extends State<ParkingStatisticsCarsPage> {
   String info = '';
 
   List<ParkingStatisticsItem> parkingStatisticsItems = [];
-  List<ParkingStatisticsItem> temp = [
-    ParkingStatisticsItem(
-        floor: "1. piętro",
-        parkingSpot: "M:0",
-        vehicle:
-            Vehicle(brand: "BRAND", model: "MODEL", registration: "ETM CU48"),
-        dateStart: DateTime(2024, 2, 12, 16, 28),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: 0),
-    ParkingStatisticsItem(
-        floor: "1. piętro",
-        parkingSpot: "M:1",
-        vehicle:
-            Vehicle(brand: "BRAND", model: "MODEL", registration: "ETM CU48"),
-        dateStart: DateTime(2024, 2, 12, 16, 28),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: 0),
-    ParkingStatisticsItem(
-        floor: "1. piętro",
-        parkingSpot: "M:2",
-        vehicle:
-            Vehicle(brand: "BRAND", model: "MODEL", registration: "ETM JDJD"),
-        dateStart: DateTime(2024, 2, 12, 16, 28),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: 0),
-    ParkingStatisticsItem(
-        floor: "1. piętro",
-        parkingSpot: "M:3",
-        vehicle:
-            Vehicle(brand: "BRAND", model: "MODEL", registration: "EL JDJD"),
-        dateStart: DateTime(2023, 2, 12, 16, 28),
-        dateEnd: DateTime(2023, 2, 13, 16, 28),
-        curEarnings: 0),
-    ParkingStatisticsItem(
-        floor: "2. piętro",
-        parkingSpot: "M:0",
-        vehicle:
-            Vehicle(brand: "BRAND", model: "MODEL", registration: "EL JDJD"),
-        dateStart: DateTime(2024, 2, 12, 16, 28),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        curEarnings: 0)
-  ];
+List<ParkingStatisticsItem> temp = [];
+
+  Future<void> fetchParkingStatistics() async {
+    final apiUrl = "http://127.0.0.1:5000/parking_statistics_view/${parking.name}";
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        temp = (data['list'] as List)
+            .map((json) => ParkingStatisticsItem.fromJson(json))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load parking costs');
+    }
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    fetchParkingStatistics();
+  }
 
   void _updateSearchTerm() {
     setState(() {
@@ -241,7 +226,7 @@ class ParkingStatisticsCarsPageState extends State<ParkingStatisticsCarsPage> {
                         ),
                       ),
                       Text(
-                        "${parkingStatisticsItems[index].curEarnings} zł",
+                        "${parkingStatisticsItems[index].curEarnings.toStringAsFixed(2)} zł",
                         textAlign: TextAlign.end,
                         style: TextStyle(
                             fontSize: MediaQuery.of(context).size.height / 40),
