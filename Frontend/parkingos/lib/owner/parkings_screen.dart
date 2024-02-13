@@ -94,7 +94,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  "${sumEarningsToday} zł",
+                                  "${sumEarningsToday.toStringAsFixed(2)} zł",
                                   style: TextStyle(
                                       fontSize:
                                           MediaQuery.of(context).size.height /
@@ -138,7 +138,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  "${sumCurEarnings} zł",
+                                  "${sumCurEarnings.toStringAsFixed(2)} zł",
                                   style: TextStyle(
                                       fontSize:
                                           MediaQuery.of(context).size.height /
@@ -243,7 +243,6 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
     if (index * 2 + rowIndex >= parkingLots.length) {
       return Expanded(child: Container());
     }
-
     for (int i = 0; i < parkingLots.length; i++) {
       sumEarningsToday += parkingLots[i].earningsToday;
       sumCurEarnings += parkingLots[i].curEarnings;
@@ -351,7 +350,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                                   fontFamily: 'Jaldi'),
                             ),
                             Text(
-                              "${parkingLots[index * 2 + rowIndex].earningsToday} zł",
+                              "${parkingLots[index * 2 + rowIndex].earningsToday.toStringAsFixed(2)} zł",
                               textAlign: TextAlign.left,
                               style: TextStyle(
                                   fontSize:
@@ -376,7 +375,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                                   fontFamily: 'Jaldi'),
                             ),
                             Text(
-                              "${parkingLots[index * 2 + rowIndex].curEarnings} zł",
+                              "${parkingLots[index * 2 + rowIndex].curEarnings.toStringAsFixed(2)} zł",
                               textAlign: TextAlign.left,
                               style: TextStyle(
                                   fontSize:
@@ -389,64 +388,71 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                         ),
                       ],
                     ),
-                                            Positioned(
-                            right:0,
-                            top:0,
-                    child:
-                    Row(
-                      children: [
-                        Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              child: Text(
-                                "edytuj",
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.height <
-                                    MediaQuery.of(context).size.width
-                                ? MediaQuery.of(context).size.height / 25
-                                : MediaQuery.of(context).size.width / 25,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Jaldi',
-                            fontStyle: FontStyle.italic,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.white,
-                            decorationThickness: 3.0,
-                          ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  Navigator.pushNamed(
-                                  context,
-                                  '/edit_parking',
-                                  arguments: parkingLots[index * 2 + rowIndex],
-                          );
-                                });
-                              },
-                            )),
-                        Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              child: Text(
-                                "X",
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.height / 24,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    fontFamily: 'Jaldi'),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  parkingLots.removeAt(index * 2 + rowIndex);
-                                  deleteparking(parkingLots[index * 2 + rowIndex].id);
-                                });
-                              },
-                            ))
-                      ],
-                    ))
+                    Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Row(
+                          children: [
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  child: Text(
+                                    "edytuj",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .height <
+                                              MediaQuery.of(context).size.width
+                                          ? MediaQuery.of(context).size.height /
+                                              25
+                                          : MediaQuery.of(context).size.width /
+                                              25,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: 'Jaldi',
+                                      fontStyle: FontStyle.italic,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 3.0,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/edit_parking',
+                                        arguments:
+                                            parkingLots[index * 2 + rowIndex],
+                                      );
+                                    });
+                                  },
+                                )),
+                            Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  child: Text(
+                                    "X",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize:
+                                            MediaQuery.of(context).size.height /
+                                                24,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w900,
+                                        fontFamily: 'Jaldi'),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      parkingLots
+                                          .removeAt(index * 2 + rowIndex);
+                                      deleteparking(
+                                          parkingLots[index * 2 + rowIndex].id);
+                                    });
+                                  },
+                                ))
+                          ],
+                        ))
                   ],
                 ))),
       ),

@@ -17,6 +17,7 @@ import 'package:parkingos/util/homepage_appbar.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'util/wave_painter.dart';
 import '../globals.dart' as globals;
+
 void main() {
   runApp(const MyApp());
 }
@@ -43,7 +44,8 @@ class MyApp extends StatelessWidget {
         '/add_parking': (context) => const AddParkingScreen(),
         '/edit_parking': (context) {
           final settings = ModalRoute.of(context)!.settings;
-          if (settings.arguments is ParkingLot && globals.currentUser == 'admin@admin.admin') {
+          if (settings.arguments is ParkingLot &&
+              globals.currentUser == 'admin@admin.admin') {
             final parking = settings.arguments as ParkingLot;
             return EditParkingPage(parking: parking);
           } else {
@@ -59,7 +61,7 @@ class MyApp extends StatelessWidget {
             return const FindParkingPage();
           }
         },
-        '/owner': (context){
+        '/owner': (context) {
           if (globals.currentUser == 'admin@admin.admin') {
             return const OwnerScreen();
           } else {
@@ -68,7 +70,8 @@ class MyApp extends StatelessWidget {
         },
         '/manageParking': (context) {
           final settings = ModalRoute.of(context)!.settings;
-          if (settings.arguments is ParkingLot && globals.currentUser == 'admin@admin.admin') {
+          if (settings.arguments is ParkingLot &&
+              globals.currentUser == 'admin@admin.admin') {
             final parking = settings.arguments as ParkingLot;
             return ManageParkingScreen(parking: parking);
           } else {
