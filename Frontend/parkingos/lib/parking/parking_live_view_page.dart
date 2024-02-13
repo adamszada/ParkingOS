@@ -585,7 +585,7 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
                     ),
                   ),
                   Text(
-                    "        ${parkingLiveViewItemList[index].earning.toString()} zł",
+                    "        ${parkingLiveViewItemList[index].earning.toStringAsFixed(2)} zł",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: MediaQuery.of(context).size.height / 40),
