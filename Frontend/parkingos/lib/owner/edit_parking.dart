@@ -57,8 +57,9 @@ class EditParkingPageState extends State<EditParkingPage> {
     }
   }
 
-  final apiUrl = "http://127.0.0.1:5000/update_parking/";
-  Future<void> sendPostRequest() async {
+  
+  Future<void> sendPostRequest(String parkingID) async {
+    final apiUrl = "http://127.0.0.1:5000/update_parking/$parkingID";
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {"Content-Type": "application/json"},
@@ -481,7 +482,7 @@ class EditParkingPageState extends State<EditParkingPage> {
                                               ),
                                             ),
                                             onPressed: () {
-                                              sendPostRequest();
+                                              sendPostRequest(parking.id);
                                             },
                                             child: Center(
                                               child: Text(
