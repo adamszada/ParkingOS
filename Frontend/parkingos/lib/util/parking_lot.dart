@@ -53,6 +53,9 @@ class ParkingLot {
     dayTariff = json['dayTariff'] ?? 0.0;
     nightTariff = json['nightTariff'] ?? 0.0;
     operatingHours = json['operatingHours'] ?? '';
+    floors = json['floors'] ?? 0;
+    capacityPerFloor = json['capacityPerFloor'] ?? 0;
+
   }
 
   @override
