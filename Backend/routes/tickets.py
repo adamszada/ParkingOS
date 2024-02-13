@@ -246,6 +246,9 @@ def change_ticket_status_for_Realized(ticket_id):
 
             parking_ref.update({'currentOccupancy': currentOccupancy})
             parking_ref.update({'earningsToday': today_earnings})
+
+            currentTime = max(datetime.now().hour,1)
+            parking_ref.update({'curEarnings': today_earnings/currentTime})
             return jsonify({"message": "Bilet opłacony pomyślnie."}), 200
 
         except Exception as e:
