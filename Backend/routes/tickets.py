@@ -125,7 +125,8 @@ def update_exit_date(ticket_id):
 
             # Todo calculate money Due
             entry_date = datetime.strptime(ticket_data['entry_date'], '%Y-%m-%d %H:%M:%S.%f')
-            dayh, nightH = calculate_tariffs(entry_date, 6, 22)
+            exit_date_time = datetime.strptime(exit_date, '%Y-%m-%d %H:%M:%S.%f')
+            dayh, nightH = calculate_tariffs_to_exit(entry_date, exit_date_time, 6, 22)
             print(dayh, nightH, dayTariff, nightTariff)
             moneyDue = dayTariff * dayh + nightTariff * nightH
 
@@ -166,6 +167,28 @@ def calculate_tariffs(entry_time, day_tariff_start_hour, night_tariff_start_hour
 
     # except Exception as e:
     #     return jsonify({"message": f"Error getting tariffs: {str(e)}"}), 500
+
+def calculate_tariffs_to_exit(entry_time, exit_date, day_tariff_start_hour, night_tariff_start_hour, parking_id=0,):
+    # try:
+        # # Pobierz dane o parkingu
+        # parking_ref = db.collection('ParkingLots').document(parking_id)
+        # parking_data = parking_ref.get().to_dict()
+
+        # # Pobierz taryfy
+        # day_tariff = parking_data.get('dayTariff')
+        # night_tariff = parking_data.get('nightTariff')
+
+        night_h = 0
+        day_h = 0
+        while entry_time < exit_date:
+            if night_tariff_start_hour <= entry_time.hour < 24 or entry_time.hour >= 0 and entry_time.hour < day_tariff_start_hour:
+                night_h += 1
+            else:
+                day_h += 1
+
+            entry_time += timedelta(hours=1)
+
+        return day_h, night_h
 
 @app.route("/tickets_data/<userID>", methods=["GET"])
 def user_tickets_data(userID):
