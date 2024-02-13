@@ -112,9 +112,9 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
     floorsList.add("wszystkie piętra");
     for (int i = 0; i < parking.floors; i++) {
       if (i == 0) {
-        floorsList.add("parter");
+        floorsList.add("parter".toUpperCase());
       } else {
-        floorsList.add("${i.toString()}. piętro");
+        floorsList.add("${i.toString()}. piętro".toUpperCase());
       }
     }
     if (floor == "") floor = floorsList.first;
