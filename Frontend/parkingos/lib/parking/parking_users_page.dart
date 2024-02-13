@@ -55,27 +55,27 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
 
   List<Vehicle> tempVehicle = [];
   Future<int> fetchCars(String userId, String parkingId) async {
-    final Uri apiUrl = Uri.parse("http://127.0.0.1:5000/parking_history")
-        .replace(queryParameters: {
-      'user_id': userId,
-      'parking_id': parkingId,
-    });
-    final response;
-    if (tempVehicle.isEmpty) {
-      response = await http.get(apiUrl);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          tempVehicle = (data['cars_history'] as List)
-              .map((json) => Vehicle.fromJson(json))
-              .toList();
-        });
-        return 0;
-      } else {
-        tempVehicle = [];
-        throw Exception('Failed to load parking costs');
-      }
-    }
+    // final Uri apiUrl = Uri.parse("http://127.0.0.1:5000/parking_history")
+    //     .replace(queryParameters: {
+    //   'user_id': userId,
+    //   'parking_id': parkingId,
+    // });
+    // final response;
+    // if (tempVehicle.isEmpty) {
+    //   response = await http.get(apiUrl);
+    //   if (response.statusCode == 200) {
+    //     final data = jsonDecode(response.body);
+    //     setState(() {
+    //       tempVehicle = (data['cars_history'] as List)
+    //           .map((json) => Vehicle.fromJson(json))
+    //           .toList();
+    //     });
+    //     return 0;
+    //   } else {
+    //     tempVehicle = [];
+    //     throw Exception('Failed to load parking costs');
+    //   }
+    // }
     return 1;
   }
 
@@ -368,7 +368,7 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                         onPressed: () {
                           if (index != moreInfoIndex) {
                             moreInfoIndex = index;
-                            fetchCars(userList[index].id, parking.id);
+                            // fetchCars(userList[index].id, parking.id);
                           } else {
                             moreInfoIndex = -1;
                             tempVehicle = [];
@@ -405,28 +405,28 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                                       )),
                                     ],
                                   ),
-                                  FutureBuilder(
-                                      future: fetchCars(
-                                          userList[index].id, parking.id),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return CircularProgressIndicator();
-                                        } else if (snapshot.hasError) {
-                                          return Container();
-                                        } else {
-                                          return ListView.builder(
-                                            shrinkWrap: true,
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: tempVehicle
-                                                .length, // Ilość elementów w wewnętrznej liście
-                                            itemBuilder: (context, subIndex) {
-                                              return buildUserCarItem(subIndex);
-                                            },
-                                          );
-                                        }
-                                      }),
+                                  // FutureBuilder(
+                                  //     future: fetchCars(
+                                  //         userList[index].id, parking.id),
+                                  //     builder: (context, snapshot) {
+                                  //       if (snapshot.connectionState ==
+                                  //           ConnectionState.waiting) {
+                                  //         return CircularProgressIndicator();
+                                  //       } else if (snapshot.hasError) {
+                                  //         return Container();
+                                  //       } else {
+                                  //         return ListView.builder(
+                                  //           shrinkWrap: true,
+                                  //           physics:
+                                  //               const NeverScrollableScrollPhysics(),
+                                  //           itemCount: tempVehicle
+                                  //               .length, // Ilość elementów w wewnętrznej liście
+                                  //           itemBuilder: (context, subIndex) {
+                                  //             return buildUserCarItem(subIndex);
+                                  //           },
+                                  //         );
+                                  //       }
+                                  //     }),
                                 ],
                               ))
                             ],
