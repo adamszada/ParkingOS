@@ -16,4 +16,16 @@ class Vehicle {
     model = json['model'] ?? '';
     brand = json['brand'] ?? '';
   }
+
+  factory Vehicle.fromString(String s) {
+    var parts = s.split(' | ');
+    if (parts.length != 3) {
+      throw FormatException('Invalid input string format');
+    }
+    return Vehicle(
+      brand: parts[1].toUpperCase(),
+      model: parts[0].toUpperCase(),
+      registration: parts[2].toUpperCase(),
+    );
+  }
 }

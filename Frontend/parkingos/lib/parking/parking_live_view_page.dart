@@ -5,6 +5,8 @@ import 'package:parkingos/parking/util/parking_live_view_item.dart';
 import 'package:parkingos/util/parking_cost.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'package:parkingos/util/vehicle.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ParkingLiveViewPage extends StatefulWidget {
   final ParkingLot parking;
@@ -21,43 +23,60 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
   String parkingSpot = "";
   String floor = "";
 
-  List<ParkingLiveViewItem> temp = [
-    ParkingLiveViewItem(
-        floor: "1. piętro",
-        parkingSpot: "M:0",
-        vehicle: Vehicle(
-            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        earning: 0),
-    ParkingLiveViewItem(
-        floor: "1. piętro",
-        parkingSpot: "M:1",
-        vehicle: Vehicle(
-            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        earning: 0),
-    ParkingLiveViewItem(
-        floor: "1. piętro",
-        parkingSpot: "M:2",
-        vehicle: Vehicle(
-            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        earning: 0),
-    ParkingLiveViewItem(
-        floor: "1. piętro",
-        parkingSpot: "M:3",
-        vehicle: Vehicle(
-            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
-        dateEnd: DateTime(2023, 2, 13, 16, 28),
-        earning: 100),
-    ParkingLiveViewItem(
-        floor: "2. piętro",
-        parkingSpot: "M:0",
-        vehicle: Vehicle(
-            brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
-        dateEnd: DateTime(2024, 2, 13, 16, 28),
-        earning: 100)
-  ];
+  List<ParkingLiveViewItem> temp = [];
+  Future<void> fetchParkingCosts() async {
+    final apiUrl = "http://127.0.0.1:5000/parking_live_view/${parking.name}";
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        temp = (data['list'] as List)
+            .map((json) => ParkingLiveViewItem.fromJson(json))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load parking costs');
+    }
+  }
+
+  // temp = [
+  //   ParkingLiveViewItem(
+  //       floor: "1. piętro",
+  //       parkingSpot: "M:0",
+  //       vehicle: Vehicle(
+  //           brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+  //       dateEnd: DateTime(2024, 2, 13, 16, 28),
+  //       earning: 0),
+  //   ParkingLiveViewItem(
+  //       floor: "1. piętro",
+  //       parkingSpot: "M:1",
+  //       vehicle: Vehicle(
+  //           brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+  //       dateEnd: DateTime(2024, 2, 13, 16, 28),
+  //       earning: 0),
+  //   ParkingLiveViewItem(
+  //       floor: "1. piętro",
+  //       parkingSpot: "M:2",
+  //       vehicle: Vehicle(
+  //           brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+  //       dateEnd: DateTime(2024, 2, 13, 16, 28),
+  //       earning: 0),
+  //   ParkingLiveViewItem(
+  //       floor: "1. piętro",
+  //       parkingSpot: "M:3",
+  //       vehicle: Vehicle(
+  //           brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+  //       dateEnd: DateTime(2023, 2, 13, 16, 28),
+  //       earning: 100),
+  //   ParkingLiveViewItem(
+  //       floor: "2. piętro",
+  //       parkingSpot: "M:0",
+  //       vehicle: Vehicle(
+  //           brand: "BRAND", model: "MODEL", registration: "REGISTRATION"),
+  //       dateEnd: DateTime(2024, 2, 13, 16, 28),
+  //       earning: 100)
+  // ];
 
   List<ParkingLiveViewItem> parkingLiveViewItemList = [];
 
@@ -75,11 +94,17 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    fetchParkingCosts();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<String> parkingSpotsList = [];
     parkingSpotsList.add("wszystkie miejsca");
     for (int i = 0; i < parking.capacityPerFloor; i++) {
-      parkingSpotsList.add("M:${i.toString()}");
+      parkingSpotsList.add("M:${(i + 1).toString()}");
     }
     if (parkingSpot == "") parkingSpot = parkingSpotsList.first;
 

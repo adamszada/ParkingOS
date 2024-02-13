@@ -30,6 +30,7 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
+        print(data);
         costList = (data['parking_costs'] as List)
             .map((json) => ParkingCost.fromJson(json))
             .toList();
