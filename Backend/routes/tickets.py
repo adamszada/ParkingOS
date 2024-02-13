@@ -37,6 +37,7 @@ def add_ticket():
         registration = data.get('registration')
         parking_id = data.get('parking_id')
         entry_date = data.get('entry_date')
+        exit_date = data.get('exit_date')
         # qr_code = data.get('qr_code')
         # Todo generate QR!!!!!!!!
 
@@ -60,7 +61,7 @@ def add_ticket():
                 'parking_id': parking_id,
                 'entry_date': entry_date,
                 'realized': False,
-                'exit_date': None,
+                'exit_date': exit_date,
                 'QR': None,
                 'floor': floor,
                 'parkingSpotNumber': parkingSpotNumber,

@@ -310,7 +310,65 @@ def get_all_parking_costs():
             return jsonify({"message": f"Error getting parking costs: {str(e)}"}), 500
     return jsonify({"message": "Invalid request method."}), 405
 
+@app.route("/parking_statistics_view/<parking_name>", methods=["GET"])
+def parking_statistics_view(parking_name):
+    if request.method == "GET":
 
+        if not parking_name:
+            return jsonify({"message": "Missing 'name' parameter."}), 400
+
+        try:
+            parking_ref = db.collection("ParkingLots").where("name", "==", parking_name).limit(1).stream()
+            parking_lot = None
+            for doc in parking_ref:
+                parking_lot = doc.to_dict()
+                parking_lot['id'] = doc.id
+                break
+
+            result = []
+            parking_tickets_ref = db.collection("Tickets").where("parking_id", "==", parking_lot['id'])\
+                                                          .stream()
+
+            for ticket in parking_tickets_ref:
+                ticket_data = ticket.to_dict()
+                entry_date = ticket_data.get('entry_date')
+                floor = ticket_data.get('floor')
+                parkingSpotNumber = ticket_data.get('parkingSpotNumber')
+                registration = ticket_data.get('registration')
+                exit_date = ticket_data.get('exit_date')
+
+                car_query = db.collection('Cars').where('registration', '==', registration).limit(1).get()
+                car_data = None
+                for car in car_query:
+                    car_data = car.to_dict()
+                    break
+
+                vehicle = car_data['model'] + " | " + car_data['brand'] + " | " + registration
+                entry_date_formatted = datetime.strptime(entry_date, '%Y-%m-%d %H:%M:%S.%f')
+                exit_date_formatted = datetime.strptime(exit_date, '%Y-%m-%d %H:%M:%S.%f')
+
+                df = parking_lot['dayTariff']
+                nt = parking_lot['nightTariff']
+                day_h, night_h = calculate_tariffs(entry_date_formatted,exit_date_formatted, 6, 22)
+
+                earning = df * day_h + nt * night_h
+
+                data = {
+                    "floor": floor,
+                    "parkingSpot": parkingSpotNumber,
+                    "vehicle": vehicle,
+                    "dateStart" : entry_date,
+                    "dateEnd": exit_date,
+                    "earning": earning
+                }
+                result.append(data)
+
+            return jsonify({"message": "Sucess", "list": result})
+
+        except Exception as e:
+            return jsonify({"message": f"Error retrieving parking: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
 @app.route("/parking_live_view/<parking_name>", methods=["GET"])
 def parking_live_view(parking_name):
     if request.method == "GET":
@@ -336,6 +394,7 @@ def parking_live_view(parking_name):
                 floor = ticket_data.get('floor')
                 parkingSpotNumber = ticket_data.get('parkingSpotNumber')
                 registration = ticket_data.get('registration')
+                exit_date = ticket_data.get('exit_date')
 
                 car_query = db.collection('Cars').where('registration', '==', registration).limit(1).get()
                 car_data = None
@@ -343,12 +402,15 @@ def parking_live_view(parking_name):
                     car_data = car.to_dict()
                     break
 
+                    
+                print(exit_date, entry_date)
                 vehicle = car_data['model'] + " | " + car_data['brand'] + " | " + registration
-                e_date = datetime.strptime(entry_date, '%Y-%m-%d %H:%M:%S.%f')
+                entry_date_formatted = datetime.strptime(entry_date, '%Y-%m-%d %H:%M:%S.%f')
+                exit_date_formatted = datetime.strptime(exit_date, '%Y-%m-%d %H:%M:%S.%f')
 
                 df = parking_lot['dayTariff']
                 nt = parking_lot['nightTariff']
-                day_h, night_h = calculate_tariffs(e_date, 6, 22)
+                day_h, night_h = calculate_tariffs(entry_date_formatted,exit_date_formatted, 6, 22)
 
                 earning = df * day_h + nt * night_h
 
@@ -356,7 +418,8 @@ def parking_live_view(parking_name):
                     "floor": floor,
                     "parkingSpot": parkingSpotNumber,
                     "vehicle": vehicle,
-                    "dateEnd": entry_date,
+                    "dateStart" : entry_date,
+                    "dateEnd": exit_date,
                     "earning": earning
                 }
                 result.append(data)
@@ -369,19 +432,16 @@ def parking_live_view(parking_name):
     return jsonify({"message": "Invalid request method."}), 405
 
 
-def calculate_tariffs(entry_time, day_tariff_start_hour, night_tariff_start_hour, parking_id=0,):
-    # try:
+def calculate_tariffs(entry_time, exit_time, day_tariff_start_hour, night_tariff_start_hour, parking_id=0,):
 
-        # Obecny czas
-        current_time = datetime.now()
         night_h = 0
         day_h = 0
-        while entry_time < current_time:
+        
+        while entry_time < exit_time:
             if night_tariff_start_hour <= entry_time.hour < 24 or entry_time.hour >= 0 and entry_time.hour < day_tariff_start_hour:
                 night_h += 1
             else:
                 day_h += 1
-
             entry_time += timedelta(hours=1)
 
         return day_h, night_h

@@ -227,6 +227,9 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                                     brandController.text = "";
                                   }
                                 });
+                                setState(() {
+                                  
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF0C3C61),

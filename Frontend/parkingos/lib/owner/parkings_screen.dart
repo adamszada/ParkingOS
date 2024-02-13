@@ -48,14 +48,17 @@ Future<List<ParkingLot>> getAllParkings() async {
   }
 }
 
-double sumEarningsToday = 0;
-double sumCurEarnings = 0;
+  double sumEarningsToday = 0;
+  double sumCurEarnings = 0;
+
 
 class _ParkingsScreenState extends State<ParkingsScreen> {
   Future<List<ParkingLot>> parkinglots = getAllParkings();
 
   @override
   Widget build(BuildContext context) {
+
+
     return Column(
       children: [
         SizedBox(
@@ -205,6 +208,8 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
               } else if (snapshot.hasError) {
                 return Center(child: Text("Error: ${snapshot.error}"));
               } else if (snapshot.hasData) {
+                              sumEarningsToday = 0;
+              sumCurEarnings = 0;
                 return buildParkingLotList(snapshot.data!);
               } else {
                 return Center(child: Text("No parkings found"));
