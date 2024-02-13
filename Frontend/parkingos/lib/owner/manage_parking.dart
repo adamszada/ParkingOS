@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkingos/main.dart';
 import 'package:parkingos/parking/parking_costs_page.dart';
 import 'package:parkingos/parking/parking_live_view_page.dart';
 import 'package:parkingos/parking/parking_statistics.dart';
@@ -50,7 +51,12 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
                       onPressed: () {
                         globals.currentUser = "";
                         globals.userID = "";
-                        Navigator.pushNamed(context, '/');
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MyHomePage()),
+                          (Route<dynamic> route) => false,
+                        );
                       },
                       child: const Text(
                         'wyloguj',

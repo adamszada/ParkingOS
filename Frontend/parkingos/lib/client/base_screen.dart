@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:parkingos/client/add_vehicle_page.dart';
 import 'package:parkingos/client/find_parking_page.dart';
 import 'package:parkingos/client/my_account.dart';
+import 'package:parkingos/main.dart';
 import '../globals.dart' as globals;
 
 class BaseScreen extends StatefulWidget {
@@ -41,7 +42,12 @@ class BaseScreenState extends State<BaseScreen> {
                         onPressed: () {
                           globals.currentUser = "";
                           globals.userID = "";
-                          Navigator.pushNamed(context, '/');
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyHomePage()),
+                            (Route<dynamic> route) => false,
+                          );
                         },
                         child: const Text(
                           'wyloguj',

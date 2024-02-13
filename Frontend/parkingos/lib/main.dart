@@ -95,6 +95,7 @@ class MyApp extends StatelessWidget {
         },
         '/buyTicket': (context) {
           final settings = ModalRoute.of(context)!.settings;
+          if (globals.currentUser == '') return const LoginPage();
           if (settings.arguments is ParkingLot) {
             final parking = settings.arguments as ParkingLot;
             return BuyTicket(parking: parking);

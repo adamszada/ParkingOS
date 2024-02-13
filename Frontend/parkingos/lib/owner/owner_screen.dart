@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parkingos/main.dart';
 import 'package:parkingos/owner/parkings_screen.dart';
 import '../globals.dart' as globals;
 
@@ -35,7 +36,12 @@ class OwnerScreenState extends State<OwnerScreen> {
                         onPressed: () {
                           globals.currentUser = "";
                           globals.userID = "";
-                          Navigator.pushNamed(context, '/');
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyHomePage()),
+                            (Route<dynamic> route) => false,
+                          );
                         },
                         child: const Text(
                           'wyloguj',
