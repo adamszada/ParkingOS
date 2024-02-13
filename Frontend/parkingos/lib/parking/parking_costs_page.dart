@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_string_interpolations
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:parkingos/util/parking_cost.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'dart:convert';
@@ -73,6 +74,7 @@ class ParkingCostsPageState extends State<ParkingCostsPage> {
         "amount": double.parse(amountController.text),
         "title": tittleController.text,
         "type": type,
+        "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
       }),
     );
 

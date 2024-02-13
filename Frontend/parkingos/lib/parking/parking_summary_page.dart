@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_string_interpolations
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:parkingos/parking/util/parking_summary_item.dart';
 import 'package:parkingos/util/parking_cost.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:http/http.dart' as http;
 
 class ParkingSummaryPage extends StatefulWidget {
   final ParkingLot parking;
@@ -21,27 +23,53 @@ class ParkingSummaryPageState extends State<ParkingSummaryPage> {
   final ParkingLot parking;
   ParkingSummaryPageState({required this.parking});
 
-  List<ParkingSummaryItem> temp = [
-    ParkingSummaryItem(month: "maj", year: "2023", costs: 1050, earning: 19500),
-    ParkingSummaryItem(
-        month: "czerwiec", year: "2023", costs: 1060, earning: 14000),
-    ParkingSummaryItem(
-        month: "lipiec", year: "2023", costs: 1070, earning: 19300),
-    ParkingSummaryItem(
-        month: "sierpień", year: "2023", costs: 1080, earning: 19200),
-    ParkingSummaryItem(
-        month: "wrzesień", year: "2023", costs: 1090, earning: 19100),
-    ParkingSummaryItem(
-        month: "październik", year: "2023", costs: 1100, earning: 19000),
-    ParkingSummaryItem(
-        month: "listopad", year: "2023", costs: 1110, earning: 18900),
-    ParkingSummaryItem(
-        month: "grudzień", year: "2023", costs: 1120, earning: 18800),
-    ParkingSummaryItem(
-        month: "styczeń", year: "2024", costs: 1010, earning: 19900),
-    ParkingSummaryItem(
-        month: "luty", year: "2024", costs: 1020, earning: 19800),
-  ];
+  List<ParkingSummaryItem> temp = [];
+
+  Future<void> fetchParkingStatistics() async {
+    final apiUrl = "http://127.0.0.1:5000/parking_summary/${parking.id}";
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        temp = (data['summaries'] as List)
+            .map((json) => ParkingSummaryItem.fromJson(json))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load parking costs');
+    }
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    fetchParkingStatistics();
+  }
+
+
+  // List<ParkingSummaryItem> temp = [
+  //   ParkingSummaryItem(month: "maj", year: "2023", costs: 1050, earning: 19500),
+  //   ParkingSummaryItem(
+  //       month: "czerwiec", year: "2023", costs: 1060, earning: 14000),
+  //   ParkingSummaryItem(
+  //       month: "lipiec", year: "2023", costs: 1070, earning: 19300),
+  //   ParkingSummaryItem(
+  //       month: "sierpień", year: "2023", costs: 1080, earning: 19200),
+  //   ParkingSummaryItem(
+  //       month: "wrzesień", year: "2023", costs: 1090, earning: 19100),
+  //   ParkingSummaryItem(
+  //       month: "październik", year: "2023", costs: 1100, earning: 19000),
+  //   ParkingSummaryItem(
+  //       month: "listopad", year: "2023", costs: 1110, earning: 18900),
+  //   ParkingSummaryItem(
+  //       month: "grudzień", year: "2023", costs: 1120, earning: 18800),
+  //   ParkingSummaryItem(
+  //       month: "styczeń", year: "2024", costs: 1010, earning: 19900),
+  //   ParkingSummaryItem(
+  //       month: "luty", year: "2024", costs: 1020, earning: 19800),
+  // ];
 
   List<BarChartGroupData> getBarGroups(List<ParkingSummaryItem> data) {
     return List.generate(data.length, (index) {
