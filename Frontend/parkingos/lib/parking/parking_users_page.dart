@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:parkingos/util/parking_lot.dart';
 import 'package:parkingos/util/parking_user.dart';
 import 'package:parkingos/util/vehicle.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ParkingUsersPage extends StatefulWidget {
   final ParkingLot parking;
@@ -12,19 +14,14 @@ class ParkingUsersPage extends StatefulWidget {
       ParkingUsersPageState(parking: this.parking);
 }
 
-List<ParkingUser> temp = [
-  ParkingUser(login: "Anna", balance: 50.0, isBlocked: true),
-  ParkingUser(login: "Tomasz", balance: 75.0),
-  ParkingUser(login: "Katarzyna", balance: 60.0),
-  ParkingUser(login: "Marcin", balance: 45.0),
-  ParkingUser(login: "Ewa", balance: 80.0),
-];
+// List<ParkingUser> temp = [
+//   ParkingUser(login: "Anna", balance: 50.0, isBlocked: true),
+//   ParkingUser(login: "Tomasz", balance: 75.0),
+//   ParkingUser(login: "Katarzyna", balance: 60.0),
+//   ParkingUser(login: "Marcin", balance: 45.0),
+//   ParkingUser(login: "Ewa", balance: 80.0),
+// ];
 
-List<Vehicle> tempVehicle = [
-  Vehicle(brand: "a", model: "a", registration: "a"),
-  Vehicle(brand: "b", model: "b", registration: "b"),
-  Vehicle(brand: "c", model: "c", registration: "c"),
-];
 int moreInfoIndex = -1;
 
 class ParkingUsersPageState extends State<ParkingUsersPage> {
@@ -36,6 +33,65 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
       _searchTerm = searchbarController.text;
     });
     // Tutaj można dodać logikę wyszukiwania, np. zaktualizować listę wyników.
+  }
+
+  List<ParkingUser> temp = [];
+  Future<void> fetchParkingCosts() async {
+    final apiUrl = "http://127.0.0.1:5000/users";
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        print(data);
+        temp = (data['users'] as List)
+            .map((json) => ParkingUser.fromJson(json))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load parking costs');
+    }
+  }
+
+  List<Vehicle> tempVehicle = [];
+  Future<int> fetchCars(String userId, String parkingId) async {
+    final Uri apiUrl = Uri.parse("http://127.0.0.1:5000/parking_history")
+        .replace(queryParameters: {
+      'user_id': userId,
+      'parking_id': parkingId,
+    });
+    final response;
+    if (tempVehicle.isEmpty) {
+      response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          tempVehicle = (data['cars_history'] as List)
+              .map((json) => Vehicle.fromJson(json))
+              .toList();
+        });
+        return 0;
+      } else {
+        tempVehicle = [];
+        throw Exception('Failed to load parking costs');
+      }
+    }
+    return 1;
+  }
+
+  Future<void> banPword(String user_id, String parking_id, bool ban) async {
+    final response = await http.post(
+      Uri.parse("http://127.0.0.1:5000/ban_user"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(
+          {"user_id": user_id, "parking_id": parking_id, "ban": ban}),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchParkingCosts();
   }
 
   TextEditingController searchbarController = TextEditingController();
@@ -287,6 +343,8 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                                     ? false
                                     : true;
                             setState(() {});
+                            banPword(userList[index].id, parking.id,
+                                userList[index].isBlocked);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: userList[index].isBlocked == true
@@ -310,8 +368,10 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                         onPressed: () {
                           if (index != moreInfoIndex) {
                             moreInfoIndex = index;
+                            fetchCars(userList[index].id, parking.id);
                           } else {
                             moreInfoIndex = -1;
+                            tempVehicle = [];
                           }
 
                           setState(() {});
@@ -345,16 +405,27 @@ class ParkingUsersPageState extends State<ParkingUsersPage> {
                                       )),
                                     ],
                                   ),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: tempVehicle
-                                        .length, // Ilość elementów w wewnętrznej liście
-                                    itemBuilder: (context, subIndex) {
-                                      return buildUserCarItem(subIndex);
-                                    },
-                                  ),
+                                  FutureBuilder(
+                                      future: fetchCars(
+                                          userList[index].id, parking.id),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                        } else {
+                                          return ListView.builder(
+                                            shrinkWrap: true,
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            itemCount: tempVehicle
+                                                .length, // Ilość elementów w wewnętrznej liście
+                                            itemBuilder: (context, subIndex) {
+                                              return buildUserCarItem(subIndex);
+                                            },
+                                          );
+                                        }
+                                      }),
                                 ],
                               ))
                             ],

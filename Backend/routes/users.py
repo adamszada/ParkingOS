@@ -22,26 +22,6 @@ def get_users():
     return jsonify({"message": "Invalid request method."}), 405
 
 
-@app.route("/users", methods=["GET"])
-def get_all_users_with_balances():
-    try:
-        all_users = auth.list_users()
-        users_data = []
-
-        for user in all_users.users:
-            user_data = {
-                "uid": user.uid,
-                "email": user.email,
-                # Pobierz saldo użytkownika
-                "saldo": get_user_balance(user.uid)
-            }
-            users_data.append(user_data)
-
-        return jsonify({"users": users_data}), 200
-    except auth.AuthError as e:
-        return jsonify({"message": f"Error retrieving users: {str(e)}"}), 500
-
-
 def check_ban_status(user_id):
     try:
         bans_ref = db.collection('Bans').where('user_id', '==', user_id).get()
@@ -62,13 +42,22 @@ def get_users_with_balances_and_bans():
                 "uid": user.uid,
                 "email": user.email,
                 "saldo": get_user_balance(user.uid),
-                "has_ban": check_ban_status(user.uid)
+                "has_ban":  check_ban_status(user.uid)
             }
             users_data.append(user_data)
 
         return jsonify({"users": users_data}), 200
     except auth.AuthError as e:
         return jsonify({"message": f"Error retrieving users: {str(e)}"}), 500
+
+
+def check_ban_status(user_id):
+    try:
+        bans_ref = db.collection('Bans').where('user_id', '==', user_id).get()
+        return len(bans_ref) > 0
+    except Exception as e:
+        print(f"Error checking ban status for user {user_id}: {str(e)}")
+        return False
 
 
 @app.route("/ban_user", methods=["POST"])
