@@ -9,7 +9,7 @@ def generate_parkingSpot(parkingID):
     parking_doc = parking_ref.get().to_dict()
 
     floors = parking_doc['floors']
-    parking_spaces_per_floor = parking_doc['spots_per_floor']
+    parking_spaces_per_floor = parking_doc['capacityPerFloor']
     parking_spaces = {floor: [False] * parking_spaces_per_floor for floor in range(1, floors + 1)}
 
     tickets_query = db.collection('Tickets').where("parking_id", "==", parkingID).where("realized", "==", False).stream()
@@ -74,8 +74,8 @@ def add_ticket():
             # update parking occupancy
             parking_ref = db.collection('ParkingLots').document(parking_id)
             parking_data = parking_ref.get().to_dict()
-            currentOccupancy = parking_data['currentOccupancy']
-            parking_ref.update({'currentOccupancy': currentOccupancy+1})
+            currentOccupancy = calculate_occupancy(parking_id)
+            parking_ref.update({'currentOccupancy': currentOccupancy})
 
             return jsonify({
                 "message": "Ticket added successfully.",
@@ -241,13 +241,40 @@ def change_ticket_status_for_Realized(ticket_id):
             # update parking occupancy
             ticket_data = ticket_ref.get().to_dict()
             parking_ref = db.collection('ParkingLots').document(ticket_data['parking_id'])
-            parking_data = parking_ref.get().to_dict()
-            currentOccupancy = parking_data['currentOccupancy']
-            parking_ref.update({'currentOccupancy': currentOccupancy - 1})
+            currentOccupancy = calculate_occupancy(ticket_data['parking_id'])
+            today_earnings = calculate_today_earing(ticket_data['parking_id'])
 
+            parking_ref.update({'currentOccupancy': currentOccupancy})
+            parking_ref.update({'earningsToday': today_earnings})
             return jsonify({"message": "Bilet opłacony pomyślnie."}), 200
 
         except Exception as e:
             return jsonify({"message": f"Błąd płatności biletu: {str(e)}"}), 500
 
     return jsonify({"message": "Nieprawidłowa metoda żądania."}), 405
+
+def calculate_today_earing(parkingID):
+    today_date = datetime.now()
+    tickets_query = db.collection('Tickets').where("parking_id", "==", parkingID)\
+                                            .where("realized", "==", True).stream()
+
+    today_earnings = 0
+    for ticket_doc in tickets_query:
+        ticket_data = ticket_doc.to_dict()
+        enterDate = ticket_data['entry_date']
+        date = datetime.strptime(enterDate, '%Y-%m-%d %H:%M:%S.%f')
+        print("Today DAte: ", today_date.date())
+        print("file date", date.date())
+        if today_date.date() == date.date():
+            today_earnings += ticket_data['moneyDue']
+
+    return today_earnings
+
+
+def calculate_occupancy(parkingID):
+    tickets_query = db.collection('Tickets').where("parking_id", "==", parkingID).where("realized", "==", False).stream()
+    current_occupancy = 0
+    for ticket_doc in tickets_query:
+        current_occupancy +=1
+
+    return current_occupancy
