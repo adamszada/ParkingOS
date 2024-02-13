@@ -71,6 +71,12 @@ def add_ticket():
             # Pobierz nowo utworzony bilet z bazy danych
             new_ticket = ticket_ref.get().to_dict()
 
+            # update parking occupancy
+            parking_ref = db.collection('ParkingLots').document(parking_id)
+            parking_data = parking_ref.get().to_dict()
+            currentOccupancy = parking_data['currentOccupancy']
+            parking_ref.update({'currentOccupancy': currentOccupancy+1})
+
             return jsonify({
                 "message": "Ticket added successfully.",
                 "ticket_id": ticket_id,
@@ -231,6 +237,13 @@ def change_ticket_status_for_Realized(ticket_id):
 
             ticket_ref = db.collection('Tickets').document(ticket_id)
             ticket_ref.update({'realized': True})
+
+            # update parking occupancy
+            ticket_data = ticket_ref.get().to_dict()
+            parking_ref = db.collection('ParkingLots').document(ticket_data['parking_id'])
+            parking_data = parking_ref.get().to_dict()
+            currentOccupancy = parking_data['currentOccupancy']
+            parking_ref.update({'currentOccupancy': currentOccupancy - 1})
 
             return jsonify({"message": "Bilet opłacony pomyślnie."}), 200
 
