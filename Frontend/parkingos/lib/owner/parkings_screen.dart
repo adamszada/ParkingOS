@@ -441,7 +441,7 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
                               onPressed: () {
                                 setState(() {
                                   parkingLots.removeAt(index * 2 + rowIndex);
-                                  //deleteparking(parkingLots[index * 2 + rowIndex].id);
+                                  deleteparking(parkingLots[index * 2 + rowIndex].id);
                                 });
                               },
                             ))

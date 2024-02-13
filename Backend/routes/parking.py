@@ -8,6 +8,7 @@ from geopy.distance import geodesic
 from app import app, db
 from geopy.geocoders import Nominatim
 
+
 geolocator = Nominatim(user_agent="parking_locator")
 
 
@@ -45,11 +46,15 @@ def add_parking():
                 "name": name,
                 "address": address,
                 "capacity": capacity,
-                "floors": floors,
-                "spots_per_floor": spots_per_floor,
+                "currentOccupancy": 0,
+                "totalEarnings": 0,
+                "earningsToday": 0,
+                "curEarnings": 0,
                 "dayTariff": dayTariff,
                 "nightTariff": nightTariff,
                 "operatingHours": operatingHours,
+                "floors": floors,
+                "capacityPerFloor": spots_per_floor,
                 "lon": lon,
                 "lat": lat
             }
@@ -59,6 +64,53 @@ def add_parking():
 
         except Exception as e:
             return jsonify({"message": f"Error adding parking: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
+
+@app.route("/update_parking/<parking_id>", methods=["POST"])
+def modify_parking(parking_id):
+    if request.method == "POST":
+        data = request.json
+        if not all(key in data for key in
+                   ['name', 'address', 'floors', 'spots_per_floor', 'dayTariff', 'nightTariff', 'operatingHours']):
+            return jsonify({"message": "Missing required fields."}), 400
+
+        name = data.get("name")
+        address = data.get("address")
+        floors = int(data.get("floors"))
+        spots_per_floor = int(data.get("spots_per_floor"))
+        dayTariff = data.get("dayTariff")
+        nightTariff = data.get("nightTariff")
+        operatingHours = data.get("operatingHours")
+
+        if floors <= 0 or spots_per_floor <= 0 or dayTariff <= 0 or nightTariff <= 0:
+            return jsonify({"message": "Invalid field values. Values must be greater than zero."}), 400
+
+        try:
+            capacity = floors * spots_per_floor
+            parking_ref = db.collection("ParkingLots").document(parking_id)
+
+            current_values = parking_ref.get().to_dict()
+            current_lon = current_values.get("lon")
+            current_lat = current_values.get("lat")
+
+            parking_ref.update({
+                "name": name,
+                "address": address,
+                "capacity": capacity,
+                "dayTariff": dayTariff,
+                "nightTariff": nightTariff,
+                "operatingHours": operatingHours,
+                "floors": floors,
+                "capacityPerFloor": spots_per_floor,
+                "lon": current_lon,
+                "lat": current_lat
+            })
+
+            return jsonify({"message": f"Parking with ID {parking_id} modified successfully."}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error modifying parking: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
 
@@ -259,8 +311,8 @@ def get_all_parking_costs():
     return jsonify({"message": "Invalid request method."}), 405
 
 
-@app.route("/parking/<parking_name>", methods=["GET"])
-def parking_overview(parking_name):
+@app.route("/parking_live_view/<parking_name>", methods=["GET"])
+def parking_live_view(parking_name):
     if request.method == "GET":
 
         if not parking_name:
@@ -274,29 +326,42 @@ def parking_overview(parking_name):
                 parking_lot['id'] = doc.id
                 break
 
-            profits_by_month = defaultdict(int)
-            parking_tickets_ref = db.collection("Tickets").where("parking_id", "==", parking_lot['id']).get()
+            result = []
+            parking_tickets_ref = db.collection("Tickets").where("parking_id", "==", parking_lot['id'])\
+                                                          .where("realized", "==", False).stream()
+
             for ticket in parking_tickets_ref:
-                entry_date = ticket.get('entry_date')
-                if entry_date:
-                    entry_month = datetime.strptime(entry_date, "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m")
-                    profits_by_month[entry_month] += ticket.to_dict()['moneyDue']
+                ticket_data = ticket.to_dict()
+                entry_date = ticket_data.get('entry_date')
+                floor = ticket_data.get('floor')
+                parkingSpotNumber = ticket_data.get('parkingSpotNumber')
+                registration = ticket_data.get('registration')
 
-            # costs_ref = db.collection("parking_costs").where("parking_id", "==", parking_lot['id']).get()
-            # parking_costs = []
-            # for cost in costs_ref:
-            #     parking_costs.append(cost.to_dict())
+                car_query = db.collection('Cars').where('registration', '==', registration).limit(1).get()
+                car_data = None
+                for car in car_query:
+                    car_data = car.to_dict()
+                    break
 
-            #print(parking_costs)
+                vehicle = car_data['model'] + " | " + car_data['brand'] + " | " + registration
+                e_date = datetime.strptime(entry_date, '%Y-%m-%d %H:%M:%S.%f')
 
-            print(profits_by_month)
-            # result = {
-            #     "month": 0,
-            #     "year": 0,
-            #     "costs": 0,
-            #     "profits": 0,
-            # }
-            return jsonify({"message": "xd"})
+                df = parking_lot['dayTariff']
+                nt = parking_lot['nightTariff']
+                day_h, night_h = calculate_tariffs(e_date, 6, 22)
+
+                earning = df * day_h + nt * night_h
+
+                data = {
+                    "floor": floor,
+                    "parkingSpot": parkingSpotNumber,
+                    "vehicle": vehicle,
+                    "dateEnd": entry_date,
+                    "earning": earning
+                }
+                result.append(data)
+
+            return jsonify({"message": "Sucess", "list": result})
 
         except Exception as e:
             return jsonify({"message": f"Error retrieving parking: {str(e)}"}), 500
@@ -304,3 +369,19 @@ def parking_overview(parking_name):
     return jsonify({"message": "Invalid request method."}), 405
 
 
+def calculate_tariffs(entry_time, day_tariff_start_hour, night_tariff_start_hour, parking_id=0,):
+    # try:
+
+        # Obecny czas
+        current_time = datetime.now()
+        night_h = 0
+        day_h = 0
+        while entry_time < current_time:
+            if night_tariff_start_hour <= entry_time.hour < 24 or entry_time.hour >= 0 and entry_time.hour < day_tariff_start_hour:
+                night_h += 1
+            else:
+                day_h += 1
+
+            entry_time += timedelta(hours=1)
+
+        return day_h, night_h

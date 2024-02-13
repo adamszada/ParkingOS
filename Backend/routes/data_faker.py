@@ -188,6 +188,8 @@ def add_random_ticket():
             ej = json.dumps(exit_date)
 
             result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
+
+
         break
 
 def parking_day_cycle(days):
@@ -207,9 +209,8 @@ def parking_day_cycle(days):
             ticket_data = {
                 "userID": user['uid'],
                 "registration": car['registration'],
-                "parking_id": "parking123",
+                "parking_id": "Ak9si4TcHes0rWWa9es4",
                 "entry_date": str(enterDate),
-                "place_id": "place456"
             }
             # Convert data to JSON format
             ticket_json = json.dumps(ticket_data)
@@ -221,12 +222,14 @@ def parking_day_cycle(days):
             response = requests.post('http://127.0.0.1:5000/add_ticket', data=ticket_json, headers=headers)
 
             exit_date = {
-                "exit_date": str(enterDate + timedelta(hours=random.randint(1, 8)))
+                    "exit_date": str(enterDate + timedelta(hours=random.randint(1, 8)))
             }
             ej = json.dumps(exit_date)
-            result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
-            currentDate += timedelta(days=1)
 
+            result = requests.patch('http://127.0.0.1:5000/update_exit_date/' + response.json()['ticket_id'], data=ej, headers=headers)
+            result2 = requests.post('http://127.0.0.1:5000/change_ticket_status_for_realized/' + response.json()['ticket_id'])
+            currentDate += timedelta(days=1)
+            print("")
 
 def generate_parking():
 
@@ -274,7 +277,7 @@ if __name__ == '__main__':
     #top_up_random_amount_for_all_users()
     #add_random_car_to_every_user()
     #add_random_cars(3)
-
-    add_random_ticket()
+    #add_random_ticket()
+    parking_day_cycle(1)
     #parking_day_cycle(30)
     #add_parking(5)

@@ -9,7 +9,7 @@ def generate_parkingSpot(parkingID):
     parking_doc = parking_ref.get().to_dict()
 
     floors = parking_doc['floors']
-    parking_spaces_per_floor = parking_doc['spots_per_floor']
+    parking_spaces_per_floor = parking_doc['capacityPerFloor']
     parking_spaces = {floor: [False] * parking_spaces_per_floor for floor in range(1, floors + 1)}
 
     tickets_query = db.collection('Tickets').where("parking_id", "==", parkingID).where("realized", "==", False).stream()
@@ -71,6 +71,12 @@ def add_ticket():
             # Pobierz nowo utworzony bilet z bazy danych
             new_ticket = ticket_ref.get().to_dict()
 
+            # update parking occupancy
+            parking_ref = db.collection('ParkingLots').document(parking_id)
+            parking_data = parking_ref.get().to_dict()
+            currentOccupancy = calculate_occupancy(parking_id)
+            parking_ref.update({'currentOccupancy': currentOccupancy})
+
             return jsonify({
                 "message": "Ticket added successfully.",
                 "ticket_id": ticket_id,
@@ -119,7 +125,8 @@ def update_exit_date(ticket_id):
 
             # Todo calculate money Due
             entry_date = datetime.strptime(ticket_data['entry_date'], '%Y-%m-%d %H:%M:%S.%f')
-            dayh, nightH = calculate_tariffs(entry_date, 6, 22)
+            exit_date_time = datetime.strptime(exit_date, '%Y-%m-%d %H:%M:%S.%f')
+            dayh, nightH = calculate_tariffs_to_exit(entry_date, exit_date_time, 6, 22)
             print(dayh, nightH, dayTariff, nightTariff)
             moneyDue = dayTariff * dayh + nightTariff * nightH
 
@@ -160,6 +167,28 @@ def calculate_tariffs(entry_time, day_tariff_start_hour, night_tariff_start_hour
 
     # except Exception as e:
     #     return jsonify({"message": f"Error getting tariffs: {str(e)}"}), 500
+
+def calculate_tariffs_to_exit(entry_time, exit_date, day_tariff_start_hour, night_tariff_start_hour, parking_id=0,):
+    # try:
+        # # Pobierz dane o parkingu
+        # parking_ref = db.collection('ParkingLots').document(parking_id)
+        # parking_data = parking_ref.get().to_dict()
+
+        # # Pobierz taryfy
+        # day_tariff = parking_data.get('dayTariff')
+        # night_tariff = parking_data.get('nightTariff')
+
+        night_h = 0
+        day_h = 0
+        while entry_time < exit_date:
+            if night_tariff_start_hour <= entry_time.hour < 24 or entry_time.hour >= 0 and entry_time.hour < day_tariff_start_hour:
+                night_h += 1
+            else:
+                day_h += 1
+
+            entry_time += timedelta(hours=1)
+
+        return day_h, night_h
 
 @app.route("/tickets_data/<userID>", methods=["GET"])
 def user_tickets_data(userID):
@@ -232,9 +261,46 @@ def change_ticket_status_for_Realized(ticket_id):
             ticket_ref = db.collection('Tickets').document(ticket_id)
             ticket_ref.update({'realized': True})
 
+            # update parking occupancy
+            ticket_data = ticket_ref.get().to_dict()
+            parking_ref = db.collection('ParkingLots').document(ticket_data['parking_id'])
+            currentOccupancy = calculate_occupancy(ticket_data['parking_id'])
+            today_earnings = calculate_today_earing(ticket_data['parking_id'])
+
+            parking_ref.update({'currentOccupancy': currentOccupancy})
+            parking_ref.update({'earningsToday': today_earnings})
+
+            currentTime = max(datetime.now().hour,1)
+            parking_ref.update({'curEarnings': today_earnings/currentTime})
             return jsonify({"message": "Bilet opłacony pomyślnie."}), 200
 
         except Exception as e:
             return jsonify({"message": f"Błąd płatności biletu: {str(e)}"}), 500
 
     return jsonify({"message": "Nieprawidłowa metoda żądania."}), 405
+
+def calculate_today_earing(parkingID):
+    today_date = datetime.now()
+    tickets_query = db.collection('Tickets').where("parking_id", "==", parkingID)\
+                                            .where("realized", "==", True).stream()
+
+    today_earnings = 0
+    for ticket_doc in tickets_query:
+        ticket_data = ticket_doc.to_dict()
+        enterDate = ticket_data['entry_date']
+        date = datetime.strptime(enterDate, '%Y-%m-%d %H:%M:%S.%f')
+        print("Today DAte: ", today_date.date())
+        print("file date", date.date())
+        if today_date.date() == date.date():
+            today_earnings += ticket_data['moneyDue']
+
+    return today_earnings
+
+
+def calculate_occupancy(parkingID):
+    tickets_query = db.collection('Tickets').where("parking_id", "==", parkingID).where("realized", "==", False).stream()
+    current_occupancy = 0
+    for ticket_doc in tickets_query:
+        current_occupancy +=1
+
+    return current_occupancy
