@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
+import json
 import os
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import firebase_admin
 from firebase_admin import credentials, auth, firestore, storage
+import pyrebase
 from dotenv import load_dotenv
 from flask_cors import CORS
 import re
 
+
+config = {
+  "apiKey": "AIzaSyAN-uMaHsuuFaqVx3TAl6IyqCHqAccM7nM",
+  "authDomain": "bazadanych-59e48.firebaseapp.com",
+  "databaseURL": "https://bazadanych-59e48-default-rtdb.europe-west1.firebasedatabase.app",
+  "storageBucket": "bazadanych-59e48.appspot.com",
+  "serviceAccount": "credentials.json"
+}
 
 
 app = Flask(__name__)
@@ -14,6 +24,8 @@ CORS(app)
 cred = credentials.Certificate("credentials.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+pb = pyrebase.initialize_app(config)
+
 
 # --- main ---
 
@@ -58,11 +70,12 @@ def login():
 
         if not is_valid_email(email):
             return jsonify({"message": "Invalid email format."}), 400
-        # Todo logoawnie nie działa, hasło jest nie sprwdzane!!!!!!!!!!
+
         try:
-            user = auth.get_user_by_email(email)
+            user = pb.auth().sign_in_with_email_and_password(email, password)
+            print(user)
             return jsonify({"message": "User successfully logged in.",
-                            "user_id": user.uid}), 200
+                            "user_id": user['localId']}), 200
         except auth.UserNotFoundError:
             return jsonify({"message": "User with provided email does not exist."}), 400
 
