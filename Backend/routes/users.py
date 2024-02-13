@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from app import app, db
-from firebase_admin import  auth
+from firebase_admin import auth
+
 
 @app.route("/get_users", methods=["GET"])
 def get_users():
@@ -21,8 +22,17 @@ def get_users():
     return jsonify({"message": "Invalid request method."}), 405
 
 
+def check_ban_status(user_id):
+    try:
+        bans_ref = db.collection('Bans').where('user_id', '==', user_id).get()
+        return len(bans_ref) > 0
+    except Exception as e:
+        print(f"Error checking ban status for user {user_id}: {str(e)}")
+        return False
+
+
 @app.route("/users", methods=["GET"])
-def get_all_users_with_balances():
+def get_users_with_balances_and_bans():
     try:
         all_users = auth.list_users()
         users_data = []
@@ -31,13 +41,87 @@ def get_all_users_with_balances():
             user_data = {
                 "uid": user.uid,
                 "email": user.email,
-                "saldo": get_user_balance(user.uid)  # Pobierz saldo użytkownika
+                "saldo": get_user_balance(user.uid),
+                "has_ban":  check_ban_status(user.uid)
             }
             users_data.append(user_data)
 
         return jsonify({"users": users_data}), 200
     except auth.AuthError as e:
         return jsonify({"message": f"Error retrieving users: {str(e)}"}), 500
+
+
+def check_ban_status(user_id):
+    try:
+        bans_ref = db.collection('Bans').where('user_id', '==', user_id).get()
+        return len(bans_ref) > 0
+    except Exception as e:
+        print(f"Error checking ban status for user {user_id}: {str(e)}")
+        return False
+
+
+@app.route("/ban_user", methods=["POST"])
+def ban_user_from_parking():
+    try:
+        data = request.json
+
+        # ban to wartość True/False
+        if not all(key in data for key in ['user_id', 'parking_id', 'ban']):
+            return jsonify({"message": "Missing required fields."}), 400
+
+        user_id = data['user_id']
+        parking_id = data['parking_id']
+        ban = data['ban']
+
+        ban_ref = db.collection('Bans').where('user_id', '==', user_id).where(
+            'parking_id', '==', parking_id).limit(1).get()
+        if ban and not ban_ref:
+            db.collection('Bans').add({
+                'user_id': user_id,
+                'parking_id': parking_id
+            })
+        elif not ban and ban_ref:
+            db.collection('Bans').document(ban_ref[0].id).delete()
+
+        return jsonify({"message": "User ban status updated successfully."}), 200
+
+    except auth.AuthError as e:
+        return jsonify({"message": f"Error banning user: {str(e)}"}), 500
+
+
+@app.route("/parking_history", methods=["GET"])
+def parking_history():
+    if request.method == "GET":
+        user_id = request.args.get('user_id')
+        parking_id = request.args.get('parking_id')
+
+        if not user_id or not parking_id:
+            return jsonify({"message": "Missing user_id or parking_id parameter."}), 400
+
+        try:
+            cars_history = db.collection('Cars').where(
+                'owner_id', '==', user_id).get()
+            cars_data = []
+
+            for car in cars_history:
+                car_data = car.to_dict()
+                car_parking_history = db.collection('Tickets').where('userID', '==', user_id)\
+                    .where('registration', '==', car_data['registration'])\
+                    .where('parking_id', '==', parking_id)\
+                    .where('realized', '==', True).get()
+                if car_parking_history:
+                    cars_data.append({
+                        'brand': car_data['brand'],
+                        'model': car_data['model'],
+                        'registration': car_data['registration']
+                    })
+
+            return jsonify({"cars_history": cars_data}), 200
+
+        except Exception as e:
+            return jsonify({"message": f"Error retrieving parking history: {str(e)}"}), 500
+
+    return jsonify({"message": "Invalid request method."}), 405
 
 
 @app.route("/get_user/<email>", methods=["GET"])
@@ -86,6 +170,7 @@ def top_up_balance_id():
         return jsonify({"message": f"Successfully topped up user balance. New balance: {new_balance}"}), 200
     except auth.AuthError as e:
         return jsonify({"message": f"Error topping up user balance: {str(e)}"}), 500
+
 
 @app.route("/topup", methods=["POST"])
 def top_up_balance():
@@ -188,6 +273,3 @@ def manage_balance():
             return jsonify({"message": f"Error managing balance: {str(e)}"}), 500
 
     return jsonify({"message": "Invalid request method."}), 405
-
-
-
