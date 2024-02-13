@@ -226,7 +226,7 @@ def add_parking_cost():
     if request.method == "POST":
         try:
             data = request.json
-            if not all(key in data for key in ['parking_id', 'amount', 'title', 'type']):
+            if not all(key in data for key in ['parking_id', 'amount', 'title', 'type', 'date']):
                 return jsonify({"message": "Missing required fields."}), 400
 
             parking_id = data.get("parking_id")
