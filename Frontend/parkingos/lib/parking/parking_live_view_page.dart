@@ -500,7 +500,7 @@ class ParkingLiveViewPageState extends State<ParkingLiveViewPage> {
                   ),
                   Expanded(
                     child: Text(
-                      "pojazd:",
+                      "",
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
