@@ -34,14 +34,55 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MyHomePage(),
         '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/recovery': (context) => const EmailRecovery(),
-        '/newpassword': (context) => const AccountPasswordChange(),
-        '/myaccount': (context) => const MyAccount(),
-        '/topup': (context) => const TopUp(),
-        '/changeemail': (context) => const ChangeEmail(),
-        '/home': (context) => const BaseScreen(),
-        '/add_parking': (context) => const AddParkingScreen(),
+        '/recovery': (context) {
+          if (globals.currentUser != '') {
+            return const EmailRecovery();
+          } else {
+            return const LoginPage();
+          }
+        },
+        '/newpassword': (context) {
+          if (globals.currentUser != '') {
+            return const AccountPasswordChange();
+          } else {
+            return const LoginPage();
+          }
+        },
+        '/myaccount': (context) {
+          if (globals.currentUser != '') {
+            return const MyAccount();
+          } else {
+            return const LoginPage();
+          }
+        },
+        '/topup': (context) {
+          if (globals.currentUser != '') {
+            return const TopUp();
+          } else {
+            return const LoginPage();
+          }
+        },
+        '/changeemail': (context) {
+          if (globals.currentUser != '') {
+            return const ChangeEmail();
+          } else {
+            return const LoginPage();
+          }
+        },
+        '/home': (context) {
+          if (globals.currentUser != '') {
+            return const BaseScreen();
+          } else {
+            return const LoginPage();
+          }
+        },
+        '/add_parking': (context) {
+          if (globals.currentUser == 'admin@admin.admin') {
+            return const AddParkingScreen();
+          } else {
+            return const LoginPage();
+          }
+        },
         '/edit_parking': (context) {
           final settings = ModalRoute.of(context)!.settings;
           if (settings.arguments is ParkingLot &&

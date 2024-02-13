@@ -6,6 +6,7 @@ import 'package:parkingos/parking/parking_summary_page.dart';
 import 'package:parkingos/parking/parking_users_page.dart';
 import 'package:parkingos/parking/this_parking_page.dart';
 import 'package:parkingos/util/parking_lot.dart';
+import '../globals.dart' as globals;
 
 class ManageParkingScreen extends StatefulWidget {
   final ParkingLot parking;
@@ -46,7 +47,11 @@ class ManageParkingScreenState extends State<ManageParkingScreen> {
                       right: MediaQuery.of(context).size.width / 128,
                     ),
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        globals.currentUser = "";
+                        globals.userID = "";
+                        Navigator.pushNamed(context, '/');
+                      },
                       child: const Text(
                         'wyloguj',
                         style: TextStyle(

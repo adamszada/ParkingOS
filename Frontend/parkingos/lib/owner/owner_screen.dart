@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parkingos/owner/parkings_screen.dart';
+import '../globals.dart' as globals;
 
 class OwnerScreen extends StatefulWidget {
   const OwnerScreen({super.key});
@@ -31,7 +32,11 @@ class OwnerScreenState extends State<OwnerScreen> {
                         right: MediaQuery.of(context).size.width / 128,
                       ),
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          globals.currentUser = "";
+                          globals.userID = "";
+                          Navigator.pushNamed(context, '/');
+                        },
                         child: const Text(
                           'wyloguj',
                           style: TextStyle(
