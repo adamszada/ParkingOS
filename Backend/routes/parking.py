@@ -45,11 +45,15 @@ def add_parking():
                 "name": name,
                 "address": address,
                 "capacity": capacity,
-                "floors": floors,
-                "spots_per_floor": spots_per_floor,
+                "currentOccupancy": 0,
+                "totalEarnings": 0,
+                "earningsToday": 0,
+                "curEarnings": 0,
                 "dayTariff": dayTariff,
                 "nightTariff": nightTariff,
                 "operatingHours": operatingHours,
+                "floors": floors,
+                "capacityPerFloor": spots_per_floor,
                 "lon": lon,
                 "lat": lat
             }
