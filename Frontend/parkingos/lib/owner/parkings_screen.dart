@@ -48,17 +48,34 @@ Future<List<ParkingLot>> getAllParkings() async {
   }
 }
 
-  double sumEarningsToday = 0;
-  double sumCurEarnings = 0;
 
 
 class _ParkingsScreenState extends State<ParkingsScreen> {
   Future<List<ParkingLot>> parkinglots = getAllParkings();
+  double sumEarningsToday = 0;
+double sumCurEarnings = 0;
+  void _calculateEarnings(List<ParkingLot> parkingLots) {
+    setState(() {
+          for (var parkingLot in parkingLots) {
+      sumEarningsToday += parkingLot.earningsToday;
+      sumCurEarnings += parkingLot.curEarnings;
+    }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    parkinglots = getAllParkings().then((parkingLots) {
+      // Calculate earnings here, before building widgets.
+      // This ensures calculations are done ahead of time and not during build.
+      _calculateEarnings(parkingLots);
+      return parkingLots; // Make sure to return the parking lots for the FutureBuilder.
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Column(
       children: [
         SizedBox(
@@ -208,8 +225,6 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
               } else if (snapshot.hasError) {
                 return Center(child: Text("Error: ${snapshot.error}"));
               } else if (snapshot.hasData) {
-                              sumEarningsToday = 0;
-              sumCurEarnings = 0;
                 return buildParkingLotList(snapshot.data!);
               } else {
                 return Center(child: Text("No parkings found"));
@@ -247,10 +262,6 @@ class _ParkingsScreenState extends State<ParkingsScreen> {
       List<ParkingLot> parkingLots, int index, int rowIndex) {
     if (index * 2 + rowIndex >= parkingLots.length) {
       return Expanded(child: Container());
-    }
-    for (int i = 0; i < parkingLots.length; i++) {
-      sumEarningsToday += parkingLots[i].earningsToday;
-      sumCurEarnings += parkingLots[i].curEarnings;
     }
 
     return Expanded(
